@@ -1,0 +1,3 @@
+Artificial Intelligence and Machine Learning Foundations
+
+Machine learning enables computer systems to learn patterns from historical data. Supervised learning algorithms train on labeled datasets, while unsupervised learning discovers hidden structures. Deep neural networks with transformer architectures power modern Large Language Models (LLMs) such as Gemini.

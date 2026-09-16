@@ -1,0 +1,3 @@
+Quantum Computing Principles
+
+Quantum computers utilize quantum bits or qubits that exist in superpositions of states |0⟩ and |1⟩. Quantum entanglement allows qubits to share information instantaneously across quantum states.

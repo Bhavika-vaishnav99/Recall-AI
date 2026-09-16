@@ -1,0 +1,3 @@
+Energy Storage Systems and Lithium-Ion Batteries
+
+Lithium-ion batteries are widely used for energy storage in solar power setups due to their high energy density and long cycle life. Battery Management Systems (BMS) monitor cell voltage, temperature, and state of charge to prevent thermal runaway.
