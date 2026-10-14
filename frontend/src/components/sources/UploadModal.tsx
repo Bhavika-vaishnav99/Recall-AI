@@ -205,7 +205,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
               <input 
                 type="text" 
                 placeholder="Search the web for new sources" 
-                className="w-full bg-[#131518]/50 border border-notebook-border focus:border-indigo-500/50 rounded-2xl py-4 pl-[240px] pr-12 text-sm outline-none text-white placeholder:text-notebook-muted/60 transition-colors shadow-inner"
+                className="w-full bg-notebook-bg/50 border border-notebook-border focus:border-[#a8c7fa]/40 rounded-2xl py-4 pl-[240px] pr-12 text-sm outline-none text-white placeholder:text-notebook-muted/60 transition-colors shadow-inner"
               />
               <Search className="absolute right-4 top-4 w-5 h-5 text-notebook-muted" />
             </div>
@@ -217,13 +217,13 @@ export const UploadModal: React.FC<UploadModalProps> = ({
               onDrop={handleDrop}
               className={`mx-2 border border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-all relative ${
                 isDragging
-                  ? 'border-indigo-500 bg-indigo-500/5 scale-[1.01]'
+                  ? 'border-[#a8c7fa] bg-[#a8c7fa]/5 scale-[1.01]'
                   : 'border-notebook-border/80 bg-[#131518]/30'
               }`}
             >
               {isUploading && (
                 <div className="absolute inset-0 bg-[#1e2026]/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-2xl">
-                  <Loader2 className="w-8 h-8 animate-spin text-indigo-400 mb-2" />
+                  <Loader2 className="w-8 h-8 animate-spin text-[#a8c7fa] mb-2" />
                   <span className="text-sm text-notebook-text">Processing source...</span>
                 </div>
               )}
@@ -316,12 +316,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                   placeholder="https://example.com" 
                   value={urlInput}
                   onChange={e => setUrlInput(e.target.value)}
-                  className="w-full bg-[#131518] border border-notebook-border rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 outline-none"
+                  className="w-full bg-notebook-bg border border-notebook-border rounded-xl px-4 py-3 text-sm text-white focus:border-[#a8c7fa]/60 outline-none"
                 />
                 <button 
                   onClick={handleUrlSubmit}
                   disabled={!urlInput.trim() || isUploading}
-                  className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors w-full flex justify-center items-center"
+                  className="bg-[#004a77] hover:bg-[#004a77]/80 disabled:opacity-50 disabled:hover:bg-[#004a77] text-[#a8c7fa] px-6 py-2.5 rounded-lg text-sm font-medium transition-colors w-full flex justify-center items-center"
                 >
                   {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Add Website'}
                 </button>
@@ -335,12 +335,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                   placeholder="Paste your text here..." 
                   value={textInput}
                   onChange={e => setTextInput(e.target.value)}
-                  className="w-full bg-[#131518] border border-notebook-border rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 outline-none min-h-[200px] resize-none"
+                  className="w-full bg-notebook-bg border border-notebook-border rounded-xl px-4 py-3 text-sm text-white focus:border-[#a8c7fa]/60 outline-none min-h-[200px] resize-none"
                 />
                 <button 
                   onClick={handleTextSubmit}
                   disabled={!textInput.trim() || isUploading}
-                  className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors w-full flex justify-center items-center"
+                  className="bg-[#004a77] hover:bg-[#004a77]/80 disabled:opacity-50 disabled:hover:bg-[#004a77] text-[#a8c7fa] px-6 py-2.5 rounded-lg text-sm font-medium transition-colors w-full flex justify-center items-center"
                 >
                   {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Add Text'}
                 </button>
@@ -360,7 +360,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 </p>
                 <button 
                   onClick={() => setActiveView('main')}
-                  className="text-indigo-400 hover:text-indigo-300 text-sm font-medium"
+                  className="text-[#a8c7fa] hover:text-[#c2d9fb] text-sm font-medium"
                 >
                   Return to options
                 </button>

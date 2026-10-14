@@ -6,13 +6,25 @@ export interface FlashcardsContent {
   cards: { question: string; answer: string }[];
 }
 
+export type QuestionType =
+  | 'multiple_choice'
+  | 'multiple_select'
+  | 'fill_blank'
+  | 'short_answer';
+
+export interface QuizQuestion {
+  type?: QuestionType;
+  question: string;
+  options: string[];
+  correct_indices?: number[];
+  /** Legacy single-answer field on artifacts generated before question types existed. */
+  correct_index?: number;
+  answer?: string;
+  explanation: string;
+}
+
 export interface QuizContent {
-  questions: {
-    question: string;
-    options: string[];
-    correct_index: number;
-    explanation: string;
-  }[];
+  questions: QuizQuestion[];
 }
 
 export interface ReportContent {
@@ -32,25 +44,50 @@ export interface DataTableContent {
   rows: string[][];
 }
 
+export type CountPreset = 'fewer' | 'standard' | 'more';
+export type DifficultyLevel = 'easy' | 'medium' | 'hard';
+
+export interface StudioGenerateOptions {
+  count: CountPreset;
+  difficulty: DifficultyLevel;
+  question_types: QuestionType[];
+  topic?: string;
+  source_ids?: string[] | null;
+}
+
+export const DEFAULT_STUDIO_OPTIONS: StudioGenerateOptions = {
+  count: 'standard',
+  difficulty: 'medium',
+  question_types: ['multiple_choice', 'multiple_select'],
+  topic: '',
+  source_ids: null,
+};
+
 export interface StudioArtifact {
   id: string;
   notebook_id: string;
   type: StudioArtifactType;
   title: string;
   content: FlashcardsContent | QuizContent | ReportContent | SlidesContent | DataTableContent;
+  options?: StudioGenerateOptions | null;
+  status?: 'ready' | 'scheduled' | 'failed';
+  scheduled_for?: string | null;
+  error?: string | null;
   created_at: string;
 }
 
 export async function generateStudioArtifact(
   notebookId: string,
-  type: StudioArtifactType
+  type: StudioArtifactType,
+  options?: StudioGenerateOptions,
+  defer = false
 ): Promise<StudioArtifact> {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/studio/generate`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type }),
+      body: JSON.stringify({ type, ...(options ? { options } : {}), defer }),
     }
   );
   if (!response.ok) {

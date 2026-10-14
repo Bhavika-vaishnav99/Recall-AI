@@ -17,6 +17,9 @@ import {
   FileCode,
   FileType,
   Check,
+  ChevronDown,
+  ArrowRight,
+  SlidersHorizontal,
 } from 'lucide-react';
 import {
   fetchNotebookSources,
@@ -25,6 +28,7 @@ import {
   setAllSourcesActive,
   Source,
 } from '@/modules/sources/api';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { UploadModal } from './UploadModal';
 import { SourceDetailModal } from './SourceDetailModal';
 
@@ -124,15 +128,15 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
       case 'docx':
         return <FileType className="w-4 h-4 text-sky-400" />;
       case 'markdown':
-        return <FileCode className="w-4 h-4 text-purple-400" />;
+        return <FileCode className="w-4 h-4 text-[#a8c7fa]" />;
       default:
-        return <FileText className="w-4 h-4 text-indigo-400" />;
+        return <FileText className="w-4 h-4 text-[#a8c7fa]" />;
     }
   };
 
   if (collapsed) {
     return (
-      <div className="w-12 border-r border-notebook-border bg-notebook-bg flex flex-col items-center py-4 space-y-4 select-none">
+      <div className="w-12 rounded-3xl bg-[#1e1f20] border border-[#3c4043]/30 flex flex-col items-center py-4 space-y-4 select-none shrink-0">
         <button
           onClick={() => setCollapsed(false)}
           className="p-2 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
@@ -148,125 +152,122 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
   }
 
   return (
-    <aside className="w-80 border-r border-notebook-border bg-notebook-bg flex flex-col h-full select-none">
+    <aside className="w-[320px] rounded-3xl bg-[#1e1f20] border border-[#3c4043]/30 flex flex-col h-full select-none overflow-hidden shrink-0">
       {/* Panel Header */}
-      <div className="p-4 flex items-center justify-between border-b border-notebook-border/50">
-        <div className="flex items-center space-x-2">
-          <h2 className="text-notebook-text font-semibold text-sm">Sources</h2>
-          <span className="text-xs text-notebook-muted bg-notebook-card px-2 py-0.5 rounded-full border border-notebook-border">
-            {sources.length}
-          </span>
-        </div>
+      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+        <h2 className="text-[#e3e3e3] font-medium text-sm">Sources</h2>
 
-        <button
-          onClick={() => setCollapsed(true)}
-          className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
-          title="Collapse Sources Panel"
-        >
-          <PanelLeftClose className="w-4 h-4" />
-        </button>
+        <Tooltip content="Collapse Sources panel" position="right">
+          <button
+            onClick={() => setCollapsed(true)}
+            className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
+          >
+            <PanelLeftClose className="w-4 h-4" />
+          </button>
+        </Tooltip>
       </div>
 
       {/* Main Content Area */}
-      <div className="p-4 flex-1 flex flex-col space-y-4 overflow-y-auto">
+      <div className="px-4 py-2 flex-1 flex flex-col space-y-3.5 overflow-y-auto">
         {/* Add Sources Action Button */}
-        <button
-          onClick={() => setIsUploadModalOpen(true)}
-          className="w-full bg-notebook-card hover:bg-notebook-hover text-notebook-text font-medium text-xs py-2.5 px-4 rounded-xl border border-notebook-border flex items-center justify-center space-x-2 transition-all duration-150 shadow-sm hover:border-indigo-500/50"
-        >
-          <Plus className="w-4 h-4 text-indigo-400" />
-          <span>Add sources</span>
-        </button>
+        <Tooltip content="Upload PDFs, docs, links, or text to your knowledge base" position="bottom">
+          <button
+            onClick={() => setIsUploadModalOpen(true)}
+            className="w-full bg-[#28292a] hover:bg-[#333537] text-[#e3e3e3] font-medium text-xs py-2.5 px-4 rounded-full border border-white/5 flex items-center justify-center space-x-2 transition-all duration-150 shadow-sm"
+          >
+            <Plus className="w-4 h-4 text-[#e3e3e3]" />
+            <span>Add sources</span>
+          </button>
+        </Tooltip>
 
-        {/* Web Search Bar */}
-        <div className="relative">
-          <div className="absolute inset-y-0 left-2 flex items-center space-x-1 z-10">
-            <button className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors" title="Search the web">
-              <Globe className="w-3.5 h-3.5" />
-            </button>
-            <button className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors" title="Fast research">
-              <Sparkles className="w-3.5 h-3.5" />
+        {/* Web Search Box */}
+        <div className="bg-[#141415] rounded-2xl p-2.5 border border-white/5 space-y-2">
+          <div className="flex items-center px-1">
+            <input
+              type="text"
+              placeholder="Search the web for new sources"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-transparent text-xs text-notebook-text focus:outline-none placeholder:text-notebook-subtle"
+            />
+          </div>
+          <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center space-x-1.5">
+              <button className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-[#28292a] hover:bg-[#333537] text-[11px] text-notebook-text border border-white/5 transition-colors">
+                <Globe className="w-3 h-3 text-notebook-muted" />
+                <span>Web</span>
+                <ChevronDown className="w-3 h-3 text-notebook-muted" />
+              </button>
+              <button className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-[#28292a] hover:bg-[#333537] text-[11px] text-notebook-text border border-white/5 transition-colors">
+                <Sparkles className="w-3 h-3 text-notebook-muted" />
+                <span>Fast research</span>
+                <ChevronDown className="w-3 h-3 text-notebook-muted" />
+              </button>
+            </div>
+            <button className="w-6 h-6 rounded-full bg-[#28292a] hover:bg-[#333537] flex items-center justify-center text-notebook-muted hover:text-notebook-text transition-colors">
+              <ArrowRight className="w-3 h-3" />
             </button>
           </div>
-          <input
-            type="text"
-            placeholder="Search the web for new sources"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-notebook-card text-notebook-text text-xs pl-[72px] pr-9 py-2.5 rounded-xl border border-notebook-border focus:outline-none focus:border-indigo-500 placeholder:text-notebook-subtle"
-          />
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-notebook-muted pointer-events-none" />
         </div>
 
         {/* Select All Row */}
         {sources.length > 0 && (
-          <button
-            onClick={() => handleSelectAll(!allSelected)}
-            className="w-full flex items-center justify-between px-1 text-xs text-notebook-muted hover:text-notebook-text transition-colors"
-          >
-            <span>Select all</span>
-            <span
-              className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                allSelected
-                  ? 'bg-indigo-500 border-indigo-500 text-white'
-                  : 'border-notebook-subtle'
-              }`}
+          <div className="flex items-center justify-between px-1 text-xs text-notebook-muted">
+            <div className="flex items-center space-x-2">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-notebook-subtle" />
+            </div>
+            <button
+              onClick={() => handleSelectAll(!allSelected)}
+              className="flex items-center space-x-2 hover:text-notebook-text transition-colors"
             >
-              {allSelected && <Check className="w-3 h-3" />}
-            </span>
-          </button>
+              <span className="text-[11px] text-notebook-muted">Select all</span>
+              <span
+                className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                  allSelected
+                    ? 'bg-[#a8c7fa] border-[#a8c7fa] text-[#131314]'
+                    : 'border-notebook-subtle'
+                }`}
+              >
+                {allSelected && <Check className="w-3 h-3" />}
+              </span>
+            </button>
+          </div>
         )}
 
         {/* Sources List / Empty State */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-10 text-notebook-muted space-y-2">
-            <Loader2 className="w-5 h-5 animate-spin text-indigo-400" />
+            <Loader2 className="w-5 h-5 animate-spin text-[#a8c7fa]" />
             <p className="text-xs">Loading sources...</p>
           </div>
         ) : filteredSources.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-1">
             {filteredSources.map((source) => (
               <div
                 key={source.id}
                 onClick={() => setSelectedSourceId(source.id)}
-                className="bg-notebook-card hover:bg-notebook-hover border border-notebook-border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all duration-150 group"
+                className="hover:bg-notebook-hover/60 px-2 py-2 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-150 group"
               >
-                <div className="flex items-center space-x-3 truncate">
-                  <div className="w-8 h-8 rounded-lg bg-notebook-bg border border-notebook-border flex items-center justify-center shrink-0">
-                    {getFileIcon(source.file_type)}
+                <div className="flex items-center space-x-2.5 truncate min-w-0">
+                  <div className="shrink-0 flex items-center justify-center">
+                    {source.file_type === 'pdf' ? (
+                      <span className="text-rose-400 font-bold text-[9px] border border-rose-400/50 rounded px-1 py-0.5">
+                        PDF
+                      </span>
+                    ) : (
+                      getFileIcon(source.file_type)
+                    )}
                   </div>
-                  <div className="truncate">
-                    <p className="text-xs font-medium text-notebook-text truncate group-hover:text-white">
-                      {source.title}
-                    </p>
-                    <p className="text-[10px] text-notebook-muted font-mono">
-                      {formatSize(source.file_size)} • {source.chunk_count} chunks
-                    </p>
-                  </div>
+                  <p className="text-xs text-notebook-text truncate group-hover:text-white">
+                    {source.title}
+                  </p>
                 </div>
 
-                <div className="flex items-center space-x-1 shrink-0 ml-2">
-                  {/* Status Badge */}
-                  {source.status === 'processing' && (
-                    <span className="p-1 text-amber-400" title="Processing document...">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    </span>
-                  )}
-                  {source.status === 'ready' && (
-                    <span className="p-1 text-emerald-400" title="Ready">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                    </span>
-                  )}
-                  {source.status === 'failed' && (
-                    <span className="p-1 text-rose-400" title={source.error_message || 'Processing failed'}>
-                      <XCircle className="w-3.5 h-3.5" />
-                    </span>
-                  )}
-
+                <div className="flex items-center space-x-2 shrink-0 ml-2">
                   <button
                     onClick={(e) => handleDelete(e, source.id, source.title)}
                     className="p-1 text-notebook-muted hover:text-rose-400 rounded transition-colors opacity-0 group-hover:opacity-100"
-                    title="Delete Source"
+                    title="Delete source"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -275,10 +276,9 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
                     onClick={(e) => handleToggleActive(e, source)}
                     className={`w-4 h-4 rounded border flex items-center justify-center transition-colors shrink-0 ${
                       source.is_active
-                        ? 'bg-indigo-500 border-indigo-500 text-white'
+                        ? 'bg-[#a8c7fa] border-[#a8c7fa] text-[#131314]'
                         : 'border-notebook-subtle'
                     }`}
-                    title={source.is_active ? 'Included in chat & studio' : 'Excluded from chat & studio'}
                   >
                     {source.is_active && <Check className="w-3 h-3" />}
                   </button>
@@ -289,9 +289,9 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
         ) : (
           <div
             onClick={() => setIsUploadModalOpen(true)}
-            className="flex-1 border-2 border-dashed border-notebook-border/80 rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-3 bg-notebook-card/20 hover:border-indigo-500/40 transition-colors cursor-pointer group min-h-[220px]"
+            className="flex-1 border-2 border-dashed border-notebook-border/80 rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-3 bg-notebook-card/20 hover:border-[#a8c7fa]/30 transition-colors cursor-pointer group min-h-[220px]"
           >
-            <div className="w-12 h-12 rounded-2xl bg-notebook-card border border-notebook-border flex items-center justify-center text-notebook-muted group-hover:text-indigo-400 group-hover:scale-105 transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-notebook-card border border-notebook-border flex items-center justify-center text-notebook-muted group-hover:text-[#a8c7fa] group-hover:scale-105 transition-all">
               <FileText className="w-6 h-6" />
             </div>
 
@@ -306,7 +306,7 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
 
             <div className="pt-2 text-[11px] text-notebook-subtle flex items-center space-x-1">
               <UploadCloud className="w-3.5 h-3.5" />
-              <span>Drop files here or <span className="text-indigo-400 underline">add a source</span></span>
+              <span>Drop files here or <span className="text-[#a8c7fa] underline">add a source</span></span>
             </div>
           </div>
         )}

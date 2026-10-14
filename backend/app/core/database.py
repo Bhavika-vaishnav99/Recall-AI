@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Optional, Any
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from mongomock_motor import AsyncMongoMockClient
@@ -18,7 +19,8 @@ db = Database()
 
 async def connect_to_mongo():
     """Establish async MongoDB connection with automatic local in-memory fallback."""
-    logger.info("Connecting to MongoDB at %s...", settings.MONGO_URI)
+    safe_uri = re.sub(r"//([^:/@]+):[^@]*@", r"//\1:***@", settings.MONGO_URI)
+    logger.info("Connecting to MongoDB at %s...", safe_uri)
     try:
         real_client = AsyncIOMotorClient(
             settings.MONGO_URI,

@@ -6,7 +6,6 @@ import {
   BookOpen,
   Plus,
   Copy,
-  BarChart3,
   Share2,
   Settings,
   User,
@@ -15,7 +14,10 @@ import {
   Loader2,
   Grid3x3,
 } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { createNotebook } from '@/modules/notebooks/api';
+import { ShareNotebookModal } from './ShareNotebookModal';
+import { SettingsModal } from './SettingsModal';
 
 interface HeaderProps {
   notebookTitle: string;
@@ -30,6 +32,8 @@ export const Header: React.FC<HeaderProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [creatingNotebook, setCreatingNotebook] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -50,19 +54,20 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="h-14 border-b border-notebook-border bg-notebook-bg px-4 flex items-center justify-between select-none">
+    <header className="h-14 bg-notebook-bg px-4 flex items-center justify-between select-none">
       {/* Left: Logo & Notebook Title */}
       <div className="flex items-center space-x-3">
-        <button
-          onClick={() => router.push('/')}
-          className="flex items-center space-x-2 text-notebook-muted hover:text-notebook-text transition-colors"
-          title="Back to notebooks"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-            <BookOpen className="w-4 h-4" />
-          </div>
-        </button>
+        <Tooltip content="Return to Recent Notebooks dashboard" position="right">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center space-x-2.5 text-notebook-muted hover:text-notebook-text transition-colors group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            <div className="w-8 h-8 rounded-full overflow-hidden shadow-sm shrink-0 bg-[#1e1f20] flex items-center justify-center p-1">
+              <img src="/logo.png" alt="Recall AI Logo" className="w-full h-full object-contain" />
+            </div>
+          </button>
+        </Tooltip>
 
         <div className="flex items-center space-x-2">
           {isEditing ? (
@@ -73,83 +78,92 @@ export const Header: React.FC<HeaderProps> = ({
               onBlur={() => setIsEditing(false)}
               onKeyDown={(e) => e.key === 'Enter' && setIsEditing(false)}
               autoFocus
-              className="bg-notebook-card text-notebook-text px-2 py-1 rounded text-sm font-medium border border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="bg-notebook-card text-notebook-text px-2 py-1 rounded text-sm font-medium border border-[#a8c7fa]/60 focus:outline-none focus:ring-1 focus:ring-[#a8c7fa]/50"
             />
           ) : (
-            <h1
-              onClick={() => setIsEditing(true)}
-              className="text-notebook-text font-medium text-sm hover:bg-notebook-hover px-2 py-1 rounded cursor-pointer transition-colors duration-150 flex items-center gap-1.5"
-              title="Click to rename"
-            >
-              {notebookTitle || 'Untitled notebook'}
-            </h1>
+            <Tooltip content="Click to rename this notebook" position="bottom">
+              <h1
+                onClick={() => setIsEditing(true)}
+                className="text-notebook-text font-medium text-sm hover:bg-notebook-hover px-2 py-1 rounded-lg cursor-pointer transition-colors duration-150 flex items-center gap-1.5"
+              >
+                {notebookTitle || 'Untitled notebook'}
+              </h1>
+            </Tooltip>
           )}
         </div>
       </div>
 
       {/* Right: Actions & User Avatar */}
-      <div className="flex items-center space-x-2">
-        <button
-          onClick={handleCreateNotebook}
-          disabled={creatingNotebook}
-          className="flex items-center space-x-1.5 bg-notebook-text hover:bg-white text-notebook-bg text-xs font-medium px-3.5 py-2 rounded-full transition-colors duration-150 disabled:opacity-60"
-        >
-          {creatingNotebook ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <Plus className="w-3.5 h-3.5" />
-          )}
-          <span>Create notebook</span>
-        </button>
+      <div className="flex items-center space-x-1 sm:space-x-2">
+        <Tooltip content="Create a new untitled notebook" position="bottom">
+          <button
+            onClick={handleCreateNotebook}
+            disabled={creatingNotebook}
+            className="flex items-center space-x-1.5 hover:bg-notebook-hover text-notebook-text text-xs font-normal px-3 py-1.5 rounded-full transition-colors duration-150 disabled:opacity-60"
+          >
+            {creatingNotebook ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Plus className="w-3.5 h-3.5" />
+            )}
+            <span>Create notebook</span>
+          </button>
+        </Tooltip>
 
-        <button
-          onClick={handleCopyLink}
-          className="flex items-center space-x-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover px-3 py-2 rounded-full transition-colors duration-150 text-xs font-medium"
-          title="Copy Notebook Link"
-        >
-          {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-          <span>Copy</span>
-        </button>
+        <Tooltip content="Share notebook with collaborators" position="bottom">
+          <button
+            onClick={() => setIsShareOpen(true)}
+            className="flex items-center space-x-1.5 hover:bg-notebook-hover text-notebook-text text-xs font-normal px-3 py-1.5 rounded-full transition-all duration-150"
+          >
+            <Share2 className="w-3.5 h-3.5 stroke-[2]" />
+            <span>Share</span>
+          </button>
+        </Tooltip>
 
-        <button
-          className="flex items-center space-x-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover px-3 py-2 rounded-full transition-colors duration-150 text-xs font-medium"
-          title="Analytics"
-        >
-          <BarChart3 className="w-4 h-4" />
-          <span>Analytics</span>
-        </button>
-
-        <button
-          className="flex items-center space-x-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover px-3 py-2 rounded-full transition-colors duration-150 text-xs font-medium"
-          title="Share Notebook"
-        >
-          <Share2 className="w-4 h-4" />
-          <span>Share</span>
-        </button>
-
-        <button
-          className="flex items-center space-x-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover px-3 py-2 rounded-full transition-colors duration-150 text-xs font-medium"
-          title="Settings"
-        >
-          <Settings className="w-4 h-4" />
-          <span>Settings</span>
-        </button>
+        <Tooltip content="Manage notebook settings and preferences" position="bottom">
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            className="p-2 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-full transition-colors duration-150"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
+        </Tooltip>
 
         {/* PRO Label */}
-        <span className="text-[11px] font-medium text-notebook-muted px-1">PRO</span>
+        <Tooltip content="Pro plan active" position="bottom">
+          <span className="text-[10px] font-semibold tracking-wider text-notebook-muted border border-notebook-border px-2 py-0.5 rounded-full cursor-pointer hover:border-notebook-subtle transition-colors">
+            PRO
+          </span>
+        </Tooltip>
 
-        <button
-          className="p-2 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-full transition-colors duration-150"
-          title="Apps"
-        >
-          <Grid3x3 className="w-4 h-4" />
-        </button>
+        <Tooltip content="Google & Recall apps" position="bottom">
+          <button
+            className="p-2 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-full transition-colors duration-150"
+          >
+            <Grid3x3 className="w-4 h-4" />
+          </button>
+        </Tooltip>
 
         {/* User Profile Avatar */}
-        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xs font-semibold ring-2 ring-notebook-border ml-1 cursor-pointer hover:ring-indigo-500 transition-all">
-          <User className="w-4 h-4" />
-        </div>
+        <Tooltip content="User account" position="bottom">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#004a77] to-[#1a6fa8] flex items-center justify-center text-[#a8c7fa] text-xs font-semibold ring-1 ring-notebook-border ml-1 cursor-pointer hover:ring-[#a8c7fa]/40 transition-all">
+            <User className="w-3.5 h-3.5" />
+          </div>
+        </Tooltip>
       </div>
+
+      {isShareOpen && (
+        <ShareNotebookModal
+          notebookTitle={notebookTitle}
+          onClose={() => setIsShareOpen(false)}
+        />
+      )}
+
+      {isSettingsOpen && (
+        <SettingsModal
+          onClose={() => setIsSettingsOpen(false)}
+        />
+      )}
     </header>
   );
 };

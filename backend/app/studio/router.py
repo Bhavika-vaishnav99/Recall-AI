@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Path
 from app.studio.models import StudioGenerateRequest, StudioArtifactResponse
 from app.studio.services import (
     generate_studio_artifact,
+    schedule_studio_artifact,
     list_studio_artifacts,
     get_studio_artifact,
     delete_studio_artifact,
@@ -26,7 +27,13 @@ async def generate_studio_route(
     notebook_id: str = Path(...),
 ):
     try:
-        return await generate_studio_artifact(notebook_id, request.type)
+        if request.defer:
+            return await schedule_studio_artifact(
+                notebook_id, request.type, request.options.model_dump()
+            )
+        return await generate_studio_artifact(
+            notebook_id, request.type, request.options.model_dump()
+        )
     except NoSourceContentError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     except Exception as exc:

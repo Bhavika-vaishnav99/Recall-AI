@@ -12,16 +12,18 @@ const config: Config = {
     extend: {
       colors: {
         notebook: {
-          bg: '#131518',
-          card: '#1e2026',
-          hover: '#262931',
-          border: '#2e323e',
-          active: '#363a48',
-          primary: '#6366f1',
-          accent: '#8b5cf6',
-          text: '#e2e8f0',
-          muted: '#8e96a4',
-          subtle: '#5c6474',
+          bg: 'var(--notebook-bg)',
+          card: 'var(--notebook-card)',
+          hover: 'var(--notebook-hover)',
+          border: 'var(--notebook-border)',
+          active: 'var(--notebook-active)',
+          primary: 'var(--accent-blue)',
+          accent: 'var(--accent-blue-dim)',
+          text: 'var(--notebook-text)',
+          muted: 'var(--notebook-muted)',
+          subtle: 'var(--notebook-subtle)',
+          surface: 'var(--accent-surface)',
+          green: 'var(--accent-green)',
         },
       },
       fontFamily: {

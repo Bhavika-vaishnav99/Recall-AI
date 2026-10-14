@@ -21,6 +21,8 @@ import {
   Trash2,
   Plus,
   StickyNote,
+  X,
+  MoreVertical,
 } from 'lucide-react';
 import {
   generateStudioArtifact,
@@ -28,10 +30,13 @@ import {
   deleteStudioArtifact,
   StudioArtifact,
   StudioArtifactType,
+  StudioGenerateOptions,
 } from '@/modules/studio/api';
 import { fetchNotes, Note } from '@/modules/notes/api';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { StudioArtifactView } from './StudioArtifactView';
 import { NoteEditorView } from './NoteEditorView';
+import { StudioGenerateDialog } from './StudioGenerateDialog';
 
 interface StudioPanelProps {
   notebookId: string;
@@ -45,18 +50,20 @@ interface StudioTool {
   color: string;
   tint: string;
   enabled: boolean;
+  tooltip: string;
 }
 
+// NotebookLM tools ordered matching reference UI
 const studioTools: StudioTool[] = [
-  { id: 'audio', label: 'Audio Overview', icon: Mic, color: 'text-indigo-400', tint: 'bg-indigo-500/5', enabled: false },
-  { id: 'slides', label: 'Slide deck', icon: Presentation, color: 'text-amber-400', tint: 'bg-amber-500/5', enabled: true },
-  { id: 'video', label: 'Video Overview', icon: Video, color: 'text-emerald-400', tint: 'bg-emerald-500/5', enabled: false },
-  { id: 'mindmap', label: 'Mind Map', icon: GitBranch, color: 'text-purple-400', tint: 'bg-purple-500/5', enabled: false },
-  { id: 'report', label: 'Reports', icon: FileSpreadsheet, color: 'text-sky-400', tint: 'bg-sky-500/5', enabled: true },
-  { id: 'flashcards', label: 'Flashcards', icon: Layers, color: 'text-rose-400', tint: 'bg-rose-500/5', enabled: true },
-  { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-teal-400', tint: 'bg-teal-500/5', enabled: true },
-  { id: 'infographic', label: 'Infographic', icon: BarChart3, color: 'text-fuchsia-400', tint: 'bg-fuchsia-500/5', enabled: false },
-  { id: 'datatable', label: 'Data table', icon: Table, color: 'text-indigo-300', tint: 'bg-indigo-500/5', enabled: true },
+  { id: 'report', label: 'Reports', icon: FileSpreadsheet, color: 'text-rose-400', tint: 'bg-transparent', enabled: true, tooltip: 'Generate a report based on your sources' },
+  { id: 'slides', label: 'Slide deck', icon: Presentation, color: 'text-purple-300', tint: 'bg-transparent', enabled: true, tooltip: 'Generate a slide deck based on your sources' },
+  { id: 'flashcards', label: 'Flashcards', icon: Layers, color: 'text-amber-300', tint: 'bg-transparent', enabled: true, tooltip: 'Generate flashcards based on your sources' },
+  { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-blue-400', tint: 'bg-transparent', enabled: true, tooltip: 'Generate a quiz based on your sources' },
+  { id: 'datatable', label: 'Data table', icon: Table, color: 'text-[#a8c7fa]', tint: 'bg-transparent', enabled: true, tooltip: 'Generate a data table based on your sources' },
+  { id: 'video', label: 'Video Overview', icon: Video, color: 'text-emerald-400', tint: 'bg-transparent', enabled: false, tooltip: 'Generate a Video Overview based on your sources' },
+  { id: 'audio', label: 'Audio Overview', icon: Sparkles, color: 'text-[#a8c7fa]', tint: 'bg-transparent', enabled: false, tooltip: 'Generate an AI podcast based on your sources' },
+  { id: 'mindmap', label: 'Mind Map', icon: GitBranch, color: 'text-cyan-400', tint: 'bg-transparent', enabled: false, tooltip: 'Generate a mind map based on your sources' },
+  { id: 'infographic', label: 'Infographic', icon: BarChart3, color: 'text-amber-400', tint: 'bg-transparent', enabled: false, tooltip: 'Generate an AI infographic based on your sources' },
 ];
 
 function relativeTime(iso: string): string {
@@ -79,6 +86,7 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
   const [error, setError] = useState<string | null>(null);
   const [selectedArtifact, setSelectedArtifact] = useState<StudioArtifact | null>(null);
   const [activeNote, setActiveNote] = useState<Note | null | 'new'>(null);
+  const [configuringTool, setConfiguringTool] = useState<StudioTool | null>(null);
 
   const loadArtifacts = async () => {
     try {
@@ -100,21 +108,32 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notebookId]);
 
-  const handleGenerate = async (tool: StudioTool) => {
+  const handleGenerate = async (
+    tool: StudioTool,
+    options: StudioGenerateOptions,
+    defer: boolean
+  ) => {
     if (!tool.enabled || generatingType) return;
     const artifactType = tool.id as StudioArtifactType;
     setError(null);
     setGeneratingType(artifactType);
     try {
-      const artifact = await generateStudioArtifact(notebookId, artifactType);
+      const artifact = await generateStudioArtifact(notebookId, artifactType, options, defer);
       setArtifacts((prev) => [artifact, ...prev]);
-      setSelectedArtifact(artifact);
+      setConfiguringTool(null);
+      // A deferred job has no content yet, so stay on the list instead of opening it.
+      if (!defer) setSelectedArtifact(artifact);
     } catch (err: any) {
       setError(err.message || `Failed to generate ${tool.label}`);
+      setConfiguringTool(null);
     } finally {
       setGeneratingType(null);
     }
   };
+
+  const usedToday = artifacts.filter(
+    (a) => new Date(a.created_at).toDateString() === new Date().toDateString()
+  ).length;
 
   const handleDeleteArtifact = async (artifactId: string) => {
     try {
@@ -164,7 +183,7 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
 
   if (collapsed) {
     return (
-      <div className="w-12 border-l border-notebook-border bg-notebook-bg flex flex-col items-center py-4 space-y-4 select-none">
+      <div className="w-12 rounded-3xl bg-[#1e1f20] border border-[#3c4043]/30 flex flex-col items-center py-4 space-y-4 select-none shrink-0">
         <button
           onClick={() => setCollapsed(false)}
           className="p-2 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
@@ -183,21 +202,19 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
     <aside
       ref={asideRef}
       style={manualWidth ? { width: manualWidth } : undefined}
-      className={`${
-        manualWidth ? '' : isPanelExpanded ? 'w-[440px]' : 'w-80'
-      } border-l border-notebook-border bg-notebook-bg flex flex-col h-full select-none relative shrink-0 ${
-        manualWidth ? '' : 'transition-all duration-200'
-      }`}
+      className={`${manualWidth ? '' : isPanelExpanded ? 'w-[480px]' : 'w-[350px]'
+        } rounded-3xl bg-[#1e1f20] border border-[#3c4043]/30 flex flex-col h-full select-none relative shrink-0 overflow-hidden ${manualWidth ? '' : 'transition-all duration-200'
+        }`}
     >
       {/* Resize Handle */}
       <div
         onMouseDown={handleResizeStart}
-        className="absolute left-0 top-0 bottom-0 w-1.5 -ml-0.5 cursor-col-resize hover:bg-indigo-500/40 z-20 transition-colors"
+        className="absolute left-0 top-0 bottom-0 w-1.5 -ml-0.5 cursor-col-resize hover:bg-notebook-border/60 z-20 transition-colors"
         title="Drag to resize"
       />
 
       {/* Panel Header */}
-      <div className="p-4 flex items-center justify-between border-b border-notebook-border/50 shrink-0">
+      <div className="px-4 pt-4 pb-2 flex items-center justify-between shrink-0">
         {isPanelExpanded ? (
           <div className="flex items-center space-x-1 text-sm">
             <button
@@ -205,37 +222,59 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
                 setSelectedArtifact(null);
                 setActiveNote(null);
               }}
-              className="flex items-center text-notebook-muted hover:text-notebook-text transition-colors"
+              className="flex items-center text-notebook-muted hover:text-notebook-text transition-colors group"
+              title="Return to Studio overview"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               <span className="font-semibold">Studio</span>
             </button>
             <ChevronRight className="w-3.5 h-3.5 text-notebook-subtle" />
             <span className="text-notebook-text font-medium">{activeNote !== null ? 'Note' : 'App'}</span>
           </div>
         ) : (
-          <h2 className="text-notebook-text font-semibold text-sm">Studio</h2>
+          <h2 className="text-[#e3e3e3] font-medium text-sm">Studio</h2>
         )}
-        <button
-          onClick={() => setCollapsed(true)}
-          className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
-          title="Collapse Studio Panel"
-        >
-          <PanelRightClose className="w-4 h-4" />
-        </button>
+        <div className="flex items-center space-x-1">
+          {isPanelExpanded && (
+            <Tooltip content="Close output view" position="left">
+              <button
+                onClick={() => {
+                  setSelectedArtifact(null);
+                  setActiveNote(null);
+                }}
+                className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </Tooltip>
+          )}
+          <Tooltip content="Collapse Studio panel" position="left">
+            <button
+              onClick={() => setCollapsed(true)}
+              className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
+            >
+              <PanelRightClose className="w-4 h-4" />
+            </button>
+          </Tooltip>
+        </div>
       </div>
 
       {selectedArtifact ? (
-        <StudioArtifactView artifact={selectedArtifact} sourceCount={sourcesCount} />
+        <StudioArtifactView
+          artifact={selectedArtifact}
+          sourceCount={sourcesCount}
+          onClose={() => setSelectedArtifact(null)}
+        />
       ) : activeNote !== null ? (
         <NoteEditorView
           notebookId={notebookId}
           note={activeNote === 'new' ? null : activeNote}
           onSaved={handleNoteSaved}
           onDeleted={handleNoteDeleted}
+          onClose={() => setActiveNote(null)}
         />
       ) : (
-        <div className="p-4 flex-1 flex flex-col space-y-4 overflow-y-auto pb-20">
+        <div className="px-4 py-2 flex-1 flex flex-col space-y-3 overflow-y-auto pb-4">
           {error && (
             <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 flex items-start space-x-2 text-rose-300 text-[11px]">
               <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
@@ -243,129 +282,145 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
             </div>
           )}
 
-          {/* Studio Action Tiles Grid */}
-          <div className="grid grid-cols-2 gap-2">
+          {/* Multilingual Audio Overview Banner */}
+          <div className="text-[11px] text-notebook-muted leading-relaxed px-1">
+            <span>Create an Audio Overview in: </span>
+            <span className="text-[#a8c7fa]/90">हिन्दी, বাংলা, ગુજરાતી, ಕನ್ನಡ, മലയാളം, मराठी, ਪੰਜਾਬੀ, தமிழ், తెలుగు</span>
+          </div>
+
+          {/* Studio Action Tiles Grid — rounded capsules */}
+          <div className="grid grid-cols-2 gap-1.5">
             {studioTools.map((tool) => {
               const IconComponent = tool.icon;
               const isGenerating = generatingType === tool.id;
               return (
-                <button
-                  key={tool.id}
-                  onClick={() => handleGenerate(tool)}
-                  disabled={!tool.enabled || generatingType !== null}
-                  title={tool.enabled ? undefined : 'Coming soon'}
-                  className={`${tool.tint} border border-notebook-border hover:border-notebook-subtle rounded-xl p-3 flex flex-col justify-between h-20 text-left transition-all duration-150 group ${
-                    tool.enabled ? 'hover:bg-notebook-hover' : 'opacity-50 cursor-not-allowed'
-                  } disabled:hover:bg-transparent`}
-                >
-                  <div className="flex items-center justify-between w-full">
+                <Tooltip key={tool.id} content={tool.tooltip} position="bottom">
+                  <button
+                    onClick={() => tool.enabled && setConfiguringTool(tool)}
+                    disabled={!tool.enabled || generatingType !== null}
+                    className={`w-full bg-[#28292a] hover:bg-[#333537] border border-white/5 rounded-full px-3 py-2 flex items-center gap-2 text-left transition-all ${tool.enabled
+                        ? 'cursor-pointer hover:border-white/10'
+                        : 'opacity-70 cursor-pointer'
+                      } disabled:hover:bg-[#28292a]`}
+                  >
                     {isGenerating ? (
-                      <Loader2 className={`w-4 h-4 animate-spin ${tool.color}`} />
+                      <Loader2 className={`w-3.5 h-3.5 animate-spin shrink-0 ${tool.color}`} />
                     ) : (
-                      <IconComponent className={`w-4 h-4 ${tool.color}`} />
+                      <IconComponent className={`w-3.5 h-3.5 shrink-0 ${tool.color}`} />
                     )}
-                    <ChevronRight className="w-3.5 h-3.5 text-notebook-subtle group-hover:text-notebook-text transition-colors" />
-                  </div>
-                  <span className="text-[11px] font-medium text-notebook-text group-hover:text-white">
-                    {isGenerating ? 'Generating…' : tool.label}
-                  </span>
-                  {!tool.enabled && (
-                    <span className="text-[9px] text-notebook-subtle uppercase tracking-wide">Coming soon</span>
-                  )}
-                </button>
+                    <span className="text-[10.5px] font-medium text-[#e3e3e3] truncate">
+                      {tool.label}
+                    </span>
+                    {['audio', 'video', 'mindmap', 'infographic'].includes(tool.id) && (
+                      <span className="text-[8px] font-medium text-notebook-muted bg-[#3c4043]/90 border border-white/10 px-1.5 py-0.5 rounded-full ml-auto shrink-0 leading-none whitespace-nowrap">
+                        Coming soon
+                      </span>
+                    )}
+                    {tool.id === 'report' && (
+                      <span className="text-[9px] font-semibold text-[#a8c7fa] bg-[#004a77] px-1.5 py-0.2 rounded-full ml-auto shrink-0">
+                        New!
+                      </span>
+                    )}
+                  </button>
+                </Tooltip>
               );
             })}
           </div>
 
-          {/* Saved Outputs + Notes List */}
+          {/* Saved Outputs + Notes List — flat rows like NotebookLM */}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-10 text-notebook-muted space-y-2">
-              <Loader2 className="w-5 h-5 animate-spin text-indigo-400" />
+              <Loader2 className="w-5 h-5 animate-spin text-[#a8c7fa]" />
               <p className="text-xs">Loading studio outputs...</p>
             </div>
           ) : artifacts.length > 0 || notes.length > 0 ? (
-            <div className="space-y-2">
-              <p className="text-[11px] font-semibold text-notebook-muted uppercase tracking-wider">
-                Saved outputs
-              </p>
+            <div className="space-y-0.5 pt-2">
+              {notes.map((note) => (
+                <div
+                  key={note.id}
+                  onClick={() => setActiveNote(note)}
+                  className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-notebook-hover/60 cursor-pointer transition-all group"
+                >
+                  <StickyNote className="w-4 h-4 text-notebook-muted shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-normal text-notebook-text truncate">
+                      {note.title || 'New note'}
+                    </p>
+                    <p className="text-[10px] text-notebook-muted">{relativeTime(note.updated_at)}</p>
+                  </div>
+                  <div className="p-1 text-notebook-subtle rounded shrink-0 opacity-0 group-hover:opacity-100">
+                    <MoreVertical className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              ))}
+
               {artifacts.map((artifact) => {
                 const tool = studioTools.find((t) => t.id === artifact.type);
                 const Icon = tool?.icon || Layers;
                 return (
                   <div
                     key={artifact.id}
-                    onClick={() => setSelectedArtifact(artifact)}
-                    className="bg-notebook-card hover:bg-notebook-hover border border-notebook-border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all group"
+                    onClick={() => artifact.status !== 'scheduled' && setSelectedArtifact(artifact)}
+                    className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-notebook-hover/60 cursor-pointer transition-all group"
                   >
-                    <div className="flex items-center space-x-2.5 truncate">
-                      <div className="w-7 h-7 rounded-lg bg-notebook-bg border border-notebook-border flex items-center justify-center shrink-0">
-                        <Icon className={`w-3.5 h-3.5 ${tool?.color || 'text-indigo-400'}`} />
-                      </div>
-                      <div className="truncate">
-                        <p className="text-xs font-medium text-notebook-text truncate group-hover:text-white">
-                          {artifact.title}
-                        </p>
-                        <p className="text-[10px] text-notebook-muted">
-                          {sourcesCount} source{sourcesCount !== 1 ? 's' : ''} · {relativeTime(artifact.created_at)}
-                        </p>
-                      </div>
+                    <Icon className={`w-4 h-4 ${tool?.color || 'text-[#a8c7fa]'} shrink-0`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-normal text-notebook-text truncate">
+                        {artifact.title}
+                      </p>
+                      <p className="text-[10px] text-notebook-muted">
+                        {artifact.status === 'scheduled' && artifact.scheduled_for
+                          ? `Scheduled for ${new Date(artifact.scheduled_for).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+                          : artifact.status === 'failed'
+                            ? 'Generation failed'
+                            : `${sourcesCount} source${sourcesCount !== 1 ? 's' : ''} · ${relativeTime(artifact.created_at)}`}
+                      </p>
                     </div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#a8c7fa] shrink-0" />
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteArtifact(artifact.id);
-                      }}
-                      className="p-1 text-notebook-muted hover:text-rose-400 rounded transition-colors shrink-0"
-                      title="Delete"
+                      onClick={(e) => { e.stopPropagation(); handleDeleteArtifact(artifact.id); }}
+                      className="p-1 text-notebook-subtle hover:text-notebook-text rounded transition-colors shrink-0 opacity-0 group-hover:opacity-100"
+                      title="Options"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <MoreVertical className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 );
               })}
-
-              {notes.map((note) => (
-                <div
-                  key={note.id}
-                  onClick={() => setActiveNote(note)}
-                  className="bg-notebook-card hover:bg-notebook-hover border border-notebook-border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all group"
-                >
-                  <div className="flex items-center space-x-2.5 truncate">
-                    <div className="w-7 h-7 rounded-lg bg-notebook-bg border border-notebook-border flex items-center justify-center shrink-0">
-                      <StickyNote className="w-3.5 h-3.5 text-amber-300" />
-                    </div>
-                    <div className="truncate">
-                      <p className="text-xs font-medium text-notebook-text truncate group-hover:text-white">
-                        {note.title || 'Untitled note'}
-                      </p>
-                      <p className="text-[10px] text-notebook-muted">{relativeTime(note.updated_at)}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           ) : (
-            <div className="flex-1 min-h-[140px] rounded-2xl border border-notebook-border/40 bg-notebook-card/20 p-6 flex flex-col items-center justify-center text-center space-y-2">
-              <Sparkles className="w-6 h-6 text-notebook-subtle" />
-              <p className="text-xs font-medium text-notebook-text">
-                Studio output will be saved here.
-              </p>
+            <div className="flex-1 min-h-[120px] rounded-xl p-5 flex flex-col items-center justify-center text-center space-y-2">
+              <Sparkles className="w-5 h-5 text-notebook-subtle" />
+              <p className="text-xs font-medium text-notebook-text">Studio output will be saved here.</p>
               <p className="text-[11px] text-notebook-muted leading-relaxed max-w-[200px]">
-                After adding sources, click a tile above to generate a slide deck, report, flashcards, quiz, or data table.
+                Click a tile above to generate content from your sources.
               </p>
             </div>
           )}
         </div>
       )}
 
-      {/* Sticky Add Note Button */}
+      {/* Generation options dialog */}
+      {configuringTool && (
+        <StudioGenerateDialog
+          notebookId={notebookId}
+          // Disabled tiles can't be clicked, so this is always a real artifact type.
+          tool={{ ...configuringTool, id: configuringTool.id as StudioArtifactType }}
+          generating={generatingType !== null}
+          usedToday={usedToday}
+          onClose={() => !generatingType && setConfiguringTool(null)}
+          onGenerate={(options, defer) => handleGenerate(configuringTool, options, defer)}
+        />
+      )}
+
+      {/* Sticky Add Note Footer — pinned bottom right */}
       {!isPanelExpanded && (
-        <div className="absolute bottom-4 right-4 z-10">
+        <div className="p-3 pt-0 flex justify-end shrink-0">
           <button
             onClick={() => setActiveNote('new')}
-            className="bg-notebook-text hover:bg-white text-notebook-bg font-semibold text-xs py-2 px-4 rounded-full shadow-lg flex items-center space-x-1.5 hover:scale-105 transition-all"
+            className="flex items-center gap-1.5 bg-[#28292a] hover:bg-[#333537] text-notebook-text text-xs font-medium py-2 px-3.5 rounded-full border border-white/10 transition-colors shadow-sm"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <StickyNote className="w-3.5 h-3.5 text-amber-300" />
             <span>Add note</span>
           </button>
         </div>

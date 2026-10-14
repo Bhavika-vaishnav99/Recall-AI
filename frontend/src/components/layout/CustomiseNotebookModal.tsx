@@ -117,7 +117,7 @@ export const CustomiseNotebookModal: React.FC<CustomiseNotebookModalProps> = ({
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-notebook-bg text-notebook-text text-sm px-3 py-2 rounded-lg border border-notebook-border focus:outline-none focus:border-indigo-500"
+              className="w-full bg-notebook-bg text-notebook-text text-sm px-3 py-2 rounded-lg border border-notebook-border focus:outline-none focus:border-[#a8c7fa]/60"
             />
           </div>
 
@@ -128,7 +128,7 @@ export const CustomiseNotebookModal: React.FC<CustomiseNotebookModalProps> = ({
               <button
                 onClick={() => setUseCustomSummary((v) => !v)}
                 className={`w-9 h-5 rounded-full transition-colors relative shrink-0 ${
-                  useCustomSummary ? 'bg-indigo-500' : 'bg-notebook-border'
+                  useCustomSummary ? 'bg-[#a8c7fa]' : 'bg-notebook-border'
                 }`}
               >
                 <span
@@ -147,7 +147,7 @@ export const CustomiseNotebookModal: React.FC<CustomiseNotebookModalProps> = ({
                 value={customSummaryText}
                 onChange={(e) => setCustomSummaryText(e.target.value)}
                 placeholder="Write a custom summary for this notebook..."
-                className="w-full bg-notebook-bg text-notebook-text text-xs px-3 py-2 rounded-lg border border-notebook-border focus:outline-none focus:border-indigo-500 min-h-[100px] resize-none"
+                className="w-full bg-notebook-bg text-notebook-text text-xs px-3 py-2 rounded-lg border border-notebook-border focus:outline-none focus:border-[#a8c7fa]/60 min-h-[100px] resize-none"
               />
             )}
           </div>

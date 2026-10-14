@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -15,13 +16,32 @@ logging.basicConfig(
 logger = logging.getLogger("recall_ai")
 
 
+SCHEDULED_POLL_SECONDS = 60
+
+
+async def _scheduled_studio_worker():
+    """Periodically run any 'Generate later' studio jobs that are now due."""
+    from app.studio.services import run_due_scheduled_artifacts
+
+    while True:
+        try:
+            await asyncio.sleep(SCHEDULED_POLL_SECONDS)
+            await run_due_scheduled_artifacts()
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            logger.error("Scheduled studio worker error: %s", exc)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifecycle events for FastAPI application."""
     logger.info("Initializing Recall AI Backend Services...")
     await connect_to_mongo()
+    worker = asyncio.create_task(_scheduled_studio_worker())
     yield
     logger.info("Shutting down Recall AI Backend Services...")
+    worker.cancel()
     await close_mongo_connection()
 
 

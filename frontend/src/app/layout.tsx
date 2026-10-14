@@ -4,6 +4,11 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Recall AI - NotebookLM Inspired AI Knowledge Platform',
   description: 'Understand, synthesize, and interact with your personal knowledge base powered by Gemini and LangChain.',
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({
@@ -13,6 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <link rel="icon" href="/logo.png" type="image/png" sizes="any" />
+      </head>
       <body className="bg-notebook-bg text-notebook-text antialiased select-none">
         {children}
       </body>

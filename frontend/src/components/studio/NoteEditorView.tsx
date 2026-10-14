@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Trash2, Loader2, Check } from 'lucide-react';
+import { Trash2, Loader2, Check, X } from 'lucide-react';
 import { Note, createNote, updateNote, deleteNote } from '@/modules/notes/api';
 
 interface NoteEditorViewProps {
@@ -9,6 +9,7 @@ interface NoteEditorViewProps {
   note: Note | null; // null means creating a new note
   onSaved: (note: Note) => void;
   onDeleted: (noteId: string) => void;
+  onClose?: () => void;
 }
 
 export const NoteEditorView: React.FC<NoteEditorViewProps> = ({
@@ -16,6 +17,7 @@ export const NoteEditorView: React.FC<NoteEditorViewProps> = ({
   note,
   onSaved,
   onDeleted,
+  onClose,
 }) => {
   const [title, setTitle] = useState(note?.title || '');
   const [content, setContent] = useState(note?.content || '');
@@ -88,15 +90,26 @@ export const NoteEditorView: React.FC<NoteEditorViewProps> = ({
             </span>
           )}
         </div>
-        {noteId && (
-          <button
-            onClick={handleDelete}
-            className="p-1.5 text-notebook-muted hover:text-rose-400 hover:bg-notebook-hover rounded-lg transition-colors"
-            title="Delete note"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        )}
+        <div className="flex items-center space-x-1">
+          {noteId && (
+            <button
+              onClick={handleDelete}
+              className="p-1.5 text-notebook-muted hover:text-rose-400 hover:bg-notebook-hover rounded-lg transition-colors"
+              title="Delete note"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
+              title="Close note"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-5 flex flex-col space-y-3">

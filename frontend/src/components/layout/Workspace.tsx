@@ -44,7 +44,7 @@ export const Workspace: React.FC<WorkspaceProps> = ({ notebookId }) => {
       />
 
       {/* 3-Panel Main Workspace Body */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden p-2.5 pt-0 gap-2.5 bg-notebook-bg">
         {/* Panel 1: Left - Sources */}
         <SourcesPanel
           notebookId={notebookId}

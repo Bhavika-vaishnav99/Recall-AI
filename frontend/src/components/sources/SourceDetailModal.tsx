@@ -74,7 +74,7 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
         {/* Header */}
         <div className="p-4 border-b border-notebook-border flex items-center justify-between">
           <div className="flex items-center space-x-3 truncate">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-[#a8c7fa]/15 text-[#a8c7fa] flex items-center justify-center shrink-0">
               <FileText className="w-4 h-4" />
             </div>
             <div className="truncate">
@@ -109,7 +109,7 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
         <div className="flex-1 p-6 overflow-y-auto space-y-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 text-notebook-muted space-y-2">
-              <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
+              <Loader2 className="w-6 h-6 animate-spin text-[#a8c7fa]" />
               <p className="text-xs">Loading document chunks...</p>
             </div>
           ) : error ? (
@@ -144,7 +144,7 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
               {/* Chunks Listing */}
               <div className="space-y-3 pt-2">
                 <div className="flex items-center space-x-2 text-xs font-medium text-notebook-text">
-                  <Layers className="w-4 h-4 text-indigo-400" />
+                  <Layers className="w-4 h-4 text-[#a8c7fa]" />
                   <span>Extracted Document Chunks ({data?.chunks.length || 0})</span>
                 </div>
 
@@ -154,7 +154,7 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
                     className="bg-notebook-bg rounded-xl p-4 border border-notebook-border space-y-2 text-xs"
                   >
                     <div className="flex items-center justify-between text-[11px] font-mono text-notebook-muted border-b border-notebook-border/40 pb-2">
-                      <span className="text-indigo-400">Chunk #{chunk.chunk_index + 1}</span>
+                      <span className="text-[#a8c7fa]">Chunk #{chunk.chunk_index + 1}</span>
                       <span>Page {chunk.page_number ?? 1} • {chunk.char_count} chars</span>
                     </div>
                     <p className="text-notebook-text leading-relaxed font-sans whitespace-pre-wrap">
