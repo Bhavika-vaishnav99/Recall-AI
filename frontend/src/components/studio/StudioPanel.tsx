@@ -23,6 +23,7 @@ import {
   StickyNote,
   X,
   MoreVertical,
+  Maximize2,
 } from 'lucide-react';
 import {
   generateStudioArtifact,
@@ -214,48 +215,62 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
       />
 
       {/* Panel Header */}
-      <div className="px-4 pt-4 pb-2 flex items-center justify-between shrink-0">
+      <div className="px-5 pt-4 pb-2 flex items-center justify-between shrink-0">
         {isPanelExpanded ? (
-          <div className="flex items-center space-x-1 text-sm">
+          <div className="flex items-center space-x-2 text-sm">
             <button
               onClick={() => {
                 setSelectedArtifact(null);
                 setActiveNote(null);
               }}
-              className="flex items-center text-notebook-muted hover:text-notebook-text transition-colors group"
+              className="text-[#c4c7c5] hover:text-white transition-colors"
               title="Return to Studio overview"
             >
-              <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-              <span className="font-semibold">Studio</span>
+              Studio
             </button>
-            <ChevronRight className="w-3.5 h-3.5 text-notebook-subtle" />
-            <span className="text-notebook-text font-medium">{activeNote !== null ? 'Note' : 'App'}</span>
+            <ChevronRight className="w-3.5 h-3.5 text-[#80868b]" />
+            <span className="text-white font-normal">
+              {activeNote !== null
+                ? 'Note'
+                : selectedArtifact?.type === 'report'
+                ? 'Interactive Report'
+                : selectedArtifact?.type === 'slides'
+                ? 'Slide Deck'
+                : selectedArtifact?.type === 'quiz'
+                ? 'Quiz'
+                : selectedArtifact?.type === 'flashcards'
+                ? 'Flashcards'
+                : selectedArtifact?.type === 'datatable'
+                ? 'Data Table'
+                : 'Interactive Report'}
+            </span>
           </div>
         ) : (
           <h2 className="text-[#e3e3e3] font-medium text-sm">Studio</h2>
         )}
         <div className="flex items-center space-x-1">
-          {isPanelExpanded && (
-            <Tooltip content="Close output view" position="left">
+          {isPanelExpanded ? (
+            <Tooltip content="Expand view to full screen" position="left">
               <button
                 onClick={() => {
-                  setSelectedArtifact(null);
-                  setActiveNote(null);
+                  const expandBtn = document.getElementById('studio-artifact-maximize-btn');
+                  if (expandBtn) expandBtn.click();
                 }}
+                className="p-1.5 text-[#c4c7c5] hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+              </button>
+            </Tooltip>
+          ) : (
+            <Tooltip content="Collapse Studio panel" position="left">
+              <button
+                onClick={() => setCollapsed(true)}
                 className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
               >
-                <X className="w-4 h-4" />
+                <PanelRightClose className="w-4 h-4" />
               </button>
             </Tooltip>
           )}
-          <Tooltip content="Collapse Studio panel" position="left">
-            <button
-              onClick={() => setCollapsed(true)}
-              className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
-            >
-              <PanelRightClose className="w-4 h-4" />
-            </button>
-          </Tooltip>
         </div>
       </div>
 
