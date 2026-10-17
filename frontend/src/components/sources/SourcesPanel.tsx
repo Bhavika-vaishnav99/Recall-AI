@@ -17,7 +17,6 @@ import {
   FileCode,
   FileType,
   Check,
-  ChevronDown,
   ArrowRight,
   SlidersHorizontal,
 } from 'lucide-react';
@@ -136,7 +135,7 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
 
   if (collapsed) {
     return (
-      <div className="w-12 rounded-3xl bg-[#1e1f20] border border-[#3c4043]/30 flex flex-col items-center py-4 space-y-4 select-none shrink-0">
+      <div className="w-12 rounded-3xl bg-notebook-card border border-notebook-border/60 flex flex-col items-center py-4 space-y-4 select-none shrink-0">
         <button
           onClick={() => setCollapsed(false)}
           className="p-2 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
@@ -152,10 +151,10 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
   }
 
   return (
-    <aside className="w-[320px] rounded-3xl bg-[#1e1f20] border border-[#3c4043]/30 flex flex-col h-full select-none overflow-hidden shrink-0">
+    <aside className="w-full md:w-[320px] rounded-3xl bg-notebook-card flex flex-col h-full select-none overflow-hidden shrink-0">
       {/* Panel Header */}
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-        <h2 className="text-[#e3e3e3] font-medium text-sm">Sources</h2>
+        <h2 className="text-notebook-text font-medium text-sm">Sources</h2>
 
         <Tooltip content="Collapse Sources panel" position="right">
           <button
@@ -173,15 +172,15 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
         <Tooltip content="Upload PDFs, docs, links, or text to your knowledge base" position="bottom">
           <button
             onClick={() => setIsUploadModalOpen(true)}
-            className="w-full bg-[#28292a] hover:bg-[#333537] text-[#e3e3e3] font-medium text-xs py-2.5 px-4 rounded-full border border-white/5 flex items-center justify-center space-x-2 transition-all duration-150 shadow-sm"
+            className="w-full bg-notebook-hover hover:bg-notebook-active text-notebook-text font-medium text-xs py-2.5 px-4 rounded-full flex items-center justify-center space-x-2 transition-all duration-150 shadow-sm"
           >
-            <Plus className="w-4 h-4 text-[#e3e3e3]" />
+            <Plus className="w-4 h-4 text-notebook-text" />
             <span>Add sources</span>
           </button>
         </Tooltip>
 
         {/* Web Search Box */}
-        <div className="bg-[#141415] rounded-2xl p-2.5 border border-white/5 space-y-2">
+        <div className="bg-notebook-bg rounded-2xl p-2.5 space-y-2">
           <div className="flex items-center px-1">
             <input
               type="text"
@@ -193,18 +192,18 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
           </div>
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center space-x-1.5">
-              <button className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-[#28292a] hover:bg-[#333537] text-[11px] text-notebook-text border border-white/5 transition-colors">
-                <Globe className="w-3 h-3 text-notebook-muted" />
-                <span>Web</span>
-                <ChevronDown className="w-3 h-3 text-notebook-muted" />
-              </button>
-              <button className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-[#28292a] hover:bg-[#333537] text-[11px] text-notebook-text border border-white/5 transition-colors">
-                <Sparkles className="w-3 h-3 text-notebook-muted" />
-                <span>Fast research</span>
-                <ChevronDown className="w-3 h-3 text-notebook-muted" />
-              </button>
+              <Tooltip content="Web" position="bottom">
+                <button className="w-6 h-6 rounded-full bg-notebook-hover hover:bg-notebook-active flex items-center justify-center text-notebook-muted hover:text-notebook-text border border-notebook-border/50 transition-colors">
+                  <Globe className="w-3 h-3" />
+                </button>
+              </Tooltip>
+              <Tooltip content="Fast research" position="bottom">
+                <button className="w-6 h-6 rounded-full bg-notebook-hover hover:bg-notebook-active flex items-center justify-center text-notebook-muted hover:text-notebook-text border border-notebook-border/50 transition-colors">
+                  <Sparkles className="w-3 h-3" />
+                </button>
+              </Tooltip>
             </div>
-            <button className="w-6 h-6 rounded-full bg-[#28292a] hover:bg-[#333537] flex items-center justify-center text-notebook-muted hover:text-notebook-text transition-colors">
+            <button className="w-6 h-6 rounded-full bg-notebook-hover hover:bg-notebook-active flex items-center justify-center text-notebook-muted hover:text-notebook-text transition-colors">
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
@@ -258,7 +257,7 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
                       getFileIcon(source.file_type)
                     )}
                   </div>
-                  <p className="text-xs text-notebook-text truncate group-hover:text-white">
+                  <p className="text-xs text-notebook-text truncate">
                     {source.title}
                   </p>
                 </div>
@@ -289,9 +288,9 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
         ) : (
           <div
             onClick={() => setIsUploadModalOpen(true)}
-            className="flex-1 border-2 border-dashed border-notebook-border/80 rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-3 bg-notebook-card/20 hover:border-[#a8c7fa]/30 transition-colors cursor-pointer group min-h-[220px]"
+            className="flex-1 rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-3 bg-notebook-card/20 transition-colors cursor-pointer group min-h-[220px]"
           >
-            <div className="w-12 h-12 rounded-2xl bg-notebook-card border border-notebook-border flex items-center justify-center text-notebook-muted group-hover:text-[#a8c7fa] group-hover:scale-105 transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-notebook-card flex items-center justify-center text-notebook-muted group-hover:text-[#a8c7fa] group-hover:scale-105 transition-all">
               <FileText className="w-6 h-6" />
             </div>
 

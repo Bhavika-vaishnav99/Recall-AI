@@ -25,6 +25,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
       document.documentElement.classList.remove('light');
       localStorage.setItem('theme', 'dark');
     }
+    window.dispatchEvent(new Event('themechange'));
 
     setSaveSuccessMsg('Theme settings applied!');
     setTimeout(() => {

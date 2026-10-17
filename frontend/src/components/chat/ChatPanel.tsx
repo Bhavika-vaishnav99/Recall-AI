@@ -38,7 +38,7 @@ function renderBoldText(text: string): React.ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-semibold text-white">{part.slice(2, -2)}</strong>;
+      return <strong key={i} className="font-semibold text-notebook-text">{part.slice(2, -2)}</strong>;
     }
     return <React.Fragment key={i}>{part}</React.Fragment>;
   });
@@ -386,7 +386,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
 
                   {msg.sender === 'user' ? (
                     <div className="flex justify-end">
-                      <div className="bg-[#28292a] text-[#e3e3e3] text-xs md:text-sm rounded-full px-5 py-2.5 max-w-[80%] border border-white/5 shadow-sm">
+                      <div className="bg-notebook-card text-notebook-text text-xs md:text-sm rounded-full px-5 py-2.5 max-w-[80%] border border-notebook-border/50 shadow-sm">
                         {msg.text}
                       </div>
                     </div>
@@ -403,12 +403,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
                       </button>
 
                       {expandedThoughts[msg.id] && (
-                        <div className="text-xs text-notebook-subtle bg-[#1e1f20]/60 border border-notebook-border/40 rounded-xl p-3 leading-relaxed">
+                        <div className="text-xs text-notebook-subtle bg-notebook-card/60 border border-notebook-border/40 rounded-xl p-3 leading-relaxed">
                           Grounded in {sourcesCount} active source{sourcesCount !== 1 ? 's' : ''}. Analyzing document chunks and contextual embeddings...
                         </div>
                       )}
 
-                      <div className="text-xs md:text-sm text-notebook-text leading-relaxed space-y-2 [&_strong]:font-semibold [&_strong]:text-white [&_em]:text-notebook-muted [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5">
+                      <div className="text-xs md:text-sm text-notebook-text leading-relaxed space-y-2 [&_strong]:font-semibold [&_strong]:text-notebook-text [&_em]:text-notebook-muted [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5">
                         <ReactMarkdown>{msg.text}</ReactMarkdown>
                       </div>
 
@@ -466,7 +466,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
       {/* Sticky Bottom Input Bar — floating pill without top border */}
       <div className="p-4 md:px-8 pb-3 bg-transparent shrink-0">
         <div className="max-w-2xl mx-auto space-y-2">
-          <div className="bg-[#28292a] rounded-full p-2 pl-6 pr-2 border border-white/10 hover:border-white/20 transition-all flex items-center shadow-lg">
+          <div className="bg-notebook-card rounded-full p-2 pl-6 pr-2 border border-notebook-border hover:border-notebook-active transition-all flex items-center shadow-lg">
             <input
               ref={inputRef}
               type="text"
@@ -479,7 +479,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
             />
 
             <div className="flex items-center space-x-2.5">
-              <span className="text-[11px] font-medium text-notebook-muted bg-[#1e1f20] px-3 py-1 rounded-full border border-white/5">
+              <span className="text-[11px] font-medium text-notebook-muted bg-notebook-bg px-3 py-1 rounded-full border border-notebook-border/50">
                 {sourcesCount} source{sourcesCount !== 1 ? 's' : ''}
               </span>
 
@@ -488,8 +488,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
                 disabled={!inputPrompt.trim() || loading}
                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                   inputPrompt.trim() && !loading
-                    ? 'bg-[#3c4043] text-white hover:bg-[#4a4f54]'
-                    : 'bg-white/5 text-notebook-subtle cursor-not-allowed'
+                    ? 'bg-[#1a6fa8] text-white hover:bg-[#15587f]'
+                    : 'bg-notebook-hover text-notebook-subtle cursor-not-allowed'
                 }`}
                 title="Submit"
               >

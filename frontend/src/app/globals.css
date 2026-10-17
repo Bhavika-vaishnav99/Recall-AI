@@ -35,6 +35,11 @@ html.light {
   --notebook-text: #0f172a;
   --notebook-muted: #64748b;
   --notebook-subtle: #94a3b8;
+
+  --accent-blue: #1a6fa8;
+  --accent-blue-dim: #0f5a8a;
+  --accent-green: #1f9d55;
+  --accent-surface: #eef2f7;
 }
 
 body {

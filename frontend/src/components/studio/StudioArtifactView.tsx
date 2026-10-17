@@ -261,7 +261,7 @@ const QuizViewer: React.FC<{ content: QuizContent }> = ({ content }) => {
             setFinished(false);
             resetForNext();
           }}
-          className="text-xs text-[#a8c7fa] hover:text-[#c2d9fb] font-medium"
+          className="text-xs text-[#a8c7fa] hover:opacity-80 font-medium"
         >
           Retake quiz
         </button>
@@ -371,7 +371,7 @@ const QuizViewer: React.FC<{ content: QuizContent }> = ({ content }) => {
       <button
         onClick={submitted ? handleNext : handleSubmit}
         disabled={!submitted && !canSubmit}
-        className="w-full py-2.5 rounded-xl bg-notebook-text text-notebook-bg text-xs font-semibold disabled:opacity-40 hover:bg-white transition-colors"
+        className="w-full py-2.5 rounded-xl bg-notebook-text text-notebook-bg text-xs font-semibold disabled:opacity-40 hover:opacity-90 transition-colors"
       >
         {!submitted
           ? 'Check answer'
@@ -403,20 +403,20 @@ const ReportSectionBlock: React.FC<{ heading: string; content: string; isFirst?:
 }) => {
   return (
     <div className={`space-y-4 ${isFirst ? '' : 'mt-10'}`}>
-      <h3 className={`${isFirst ? 'text-2xl md:text-3xl' : 'text-xl md:text-2xl'} font-normal text-white tracking-tight`}>
+      <h3 className={`${isFirst ? 'text-2xl md:text-3xl' : 'text-xl md:text-2xl'} font-normal text-notebook-text tracking-tight`}>
         {formatHeadingText(heading)}
       </h3>
-      <div className="text-[14px] md:text-[15px] text-[#c4c7c5] leading-[1.8] font-normal space-y-3.5 [&_strong]:font-semibold [&_strong]:text-white">
+      <div className="text-[14px] md:text-[15px] text-notebook-muted leading-[1.8] font-normal space-y-3.5 [&_strong]:font-semibold [&_strong]:text-notebook-text">
         <ReactMarkdown
           components={{
             p: ({ children }) => <p className="mb-3.5 leading-[1.8]">{children}</p>,
-            strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+            strong: ({ children }) => <strong className="font-semibold text-notebook-text">{children}</strong>,
             ul: ({ children }) => <ul className="space-y-2.5 my-3 pl-1">{children}</ul>,
             ol: ({ children }) => <ol className="space-y-2.5 my-3 pl-4 list-decimal">{children}</ol>,
             li: ({ children }) => (
-              <li className="flex items-start gap-3 text-[#c4c7c5] leading-relaxed my-1.5">
-                <span className="text-[#9aa0a6] text-base shrink-0 leading-tight select-none">◦</span>
-                <span className="flex-1 [&_strong]:font-semibold [&_strong]:text-white">{children}</span>
+              <li className="flex items-start gap-3 text-notebook-muted leading-relaxed my-1.5">
+                <span className="text-notebook-subtle text-base shrink-0 leading-tight select-none">◦</span>
+                <span className="flex-1 [&_strong]:font-semibold [&_strong]:text-notebook-text">{children}</span>
               </li>
             ),
           }}
@@ -448,21 +448,21 @@ const ReportViewer: React.FC<{ content: ReportContent }> = ({ content }) => {
         <Tooltip content="Table of contents" position="bottom">
           <button
             onClick={() => setShowToc(!showToc)}
-            className="w-8 h-8 rounded-full bg-[#1e1f20] hover:bg-[#28292a] border border-white/10 flex items-center justify-center text-[#c4c7c5] hover:text-white shadow-md transition-colors"
+            className="w-8 h-8 rounded-full bg-notebook-card hover:bg-notebook-hover border border-notebook-border/50 flex items-center justify-center text-notebook-muted hover:text-notebook-text shadow-md transition-colors"
           >
             <List className="w-4 h-4" />
           </button>
         </Tooltip>
 
         {showToc && (
-          <div className="absolute left-0 top-10 w-64 bg-[#1e1f20] border border-white/10 rounded-2xl p-3 shadow-2xl z-30 space-y-1.5 animate-fadeIn">
+          <div className="absolute left-0 top-10 w-64 bg-notebook-card border border-notebook-border/50 rounded-2xl p-3 shadow-2xl z-30 space-y-1.5 animate-fadeIn">
             <p className="text-[11px] font-semibold text-notebook-muted uppercase px-2 mb-1 tracking-wider">Contents</p>
             {allSections.map((sec, i) => (
               <a
                 key={i}
                 href={`#report-sec-${i}`}
                 onClick={() => setShowToc(false)}
-                className="block text-xs text-[#c4c7c5] hover:text-white hover:bg-white/5 px-2.5 py-1.5 rounded-lg truncate transition-colors"
+                className="block text-xs text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover px-2.5 py-1.5 rounded-lg truncate transition-colors"
               >
                 {formatHeadingText(sec.heading)}
               </a>
@@ -581,18 +581,18 @@ export const StudioArtifactView: React.FC<StudioArtifactViewProps> = ({
 
   if (isExpanded) {
     return (
-      <div className="fixed inset-0 z-50 bg-[#0f0f11] flex flex-col p-6 overflow-hidden animate-fadeIn">
+      <div className="fixed inset-0 z-50 bg-notebook-bg flex flex-col p-6 overflow-hidden animate-fadeIn">
         <div className="flex items-center justify-between pb-4 mb-2 max-w-4xl mx-auto w-full">
           <div className="flex items-center space-x-3 min-w-0">
-            <h2 className="text-xl font-normal text-white truncate">{artifact.title}</h2>
-            <span className="text-xs text-[#c4c7c5] bg-[#1e1f20] border border-white/10 px-3 py-1 rounded-full shrink-0">
+            <h2 className="text-xl font-normal text-notebook-text truncate">{artifact.title}</h2>
+            <span className="text-xs text-notebook-muted bg-notebook-card border border-notebook-border/50 px-3 py-1 rounded-full shrink-0">
               {sourceCount} source{sourceCount !== 1 ? 's' : ''}
             </span>
           </div>
-          <div className="flex items-center space-x-2 text-[#c4c7c5] shrink-0">
+          <div className="flex items-center space-x-2 text-notebook-muted shrink-0">
             <button
               onClick={() => setIsExpanded(false)}
-              className="p-2 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+              className="p-2 hover:text-notebook-text hover:bg-notebook-hover rounded-xl transition-colors"
               title="Exit fullscreen"
             >
               <Minimize2 className="w-5 h-5" />
@@ -603,7 +603,7 @@ export const StudioArtifactView: React.FC<StudioArtifactViewProps> = ({
                   setIsExpanded(false);
                   onClose();
                 }}
-                className="p-2 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                className="p-2 hover:text-notebook-text hover:bg-notebook-hover rounded-xl transition-colors"
                 title="Close section"
               >
                 <X className="w-5 h-5" />
@@ -623,21 +623,21 @@ export const StudioArtifactView: React.FC<StudioArtifactViewProps> = ({
       {/* NotebookLM Single-Row Header */}
       <div className="px-6 pt-3 pb-2 flex items-center justify-between shrink-0 gap-3">
         <div className="flex items-center space-x-3 min-w-0 flex-1">
-          <h2 className="text-base font-normal text-white truncate" title={artifact.title}>
+          <h2 className="text-base font-normal text-notebook-text truncate" title={artifact.title}>
             {artifact.title}
           </h2>
           <Tooltip content="Sources grounded to generate this output" position="bottom">
-            <button className="flex items-center space-x-1.5 text-xs text-[#c4c7c5] hover:text-white bg-[#1e1f20] hover:bg-[#28292a] border border-white/10 px-3 py-1 rounded-full transition-colors shrink-0">
+            <button className="flex items-center space-x-1.5 text-xs text-notebook-muted hover:text-notebook-text bg-notebook-card hover:bg-notebook-hover border border-notebook-border/50 px-3 py-1 rounded-full transition-colors shrink-0">
               <span>View {sourceCount} source{sourceCount !== 1 ? 's' : ''}</span>
             </button>
           </Tooltip>
         </div>
 
-        <div className="flex items-center space-x-1 text-[#c4c7c5] shrink-0">
+        <div className="flex items-center space-x-1 text-notebook-muted shrink-0">
           <Tooltip content="Share this studio output" position="left">
             <button
               onClick={() => setIsShareOpen(true)}
-              className="p-1.5 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="p-1.5 hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
             >
               <Share2 className="w-4 h-4" />
             </button>
@@ -647,14 +647,14 @@ export const StudioArtifactView: React.FC<StudioArtifactViewProps> = ({
             <button
               id="studio-artifact-maximize-btn"
               onClick={() => setIsExpanded(true)}
-              className="p-1.5 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="p-1.5 hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
             >
               <Maximize2 className="w-4 h-4" />
             </button>
           </Tooltip>
 
           <Tooltip content="More options" position="left">
-            <button className="p-1.5 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+            <button className="p-1.5 hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors">
               <MoreVertical className="w-4 h-4" />
             </button>
           </Tooltip>
@@ -673,7 +673,7 @@ export const StudioArtifactView: React.FC<StudioArtifactViewProps> = ({
           className={`flex items-center space-x-2 text-xs px-3.5 py-1.5 rounded-full border transition-colors ${
             feedback === 'up'
               ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400'
-              : 'border-white/10 bg-[#1e1f20] text-[#c4c7c5] hover:text-white hover:bg-[#28292a]'
+              : 'border-notebook-border/50 bg-notebook-card text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover'
           }`}
         >
           <ThumbsUp className="w-3.5 h-3.5" />
@@ -685,7 +685,7 @@ export const StudioArtifactView: React.FC<StudioArtifactViewProps> = ({
           className={`flex items-center space-x-2 text-xs px-3.5 py-1.5 rounded-full border transition-colors ${
             feedback === 'down'
               ? 'bg-rose-500/10 border-rose-500/40 text-rose-400'
-              : 'border-white/10 bg-[#1e1f20] text-[#c4c7c5] hover:text-white hover:bg-[#28292a]'
+              : 'border-notebook-border/50 bg-notebook-card text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover'
           }`}
         >
           <ThumbsDown className="w-3.5 h-3.5" />

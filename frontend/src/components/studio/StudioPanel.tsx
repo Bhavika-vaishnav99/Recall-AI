@@ -56,15 +56,15 @@ interface StudioTool {
 
 // NotebookLM tools ordered matching reference UI
 const studioTools: StudioTool[] = [
-  { id: 'report', label: 'Reports', icon: FileSpreadsheet, color: 'text-rose-400', tint: 'bg-transparent', enabled: true, tooltip: 'Generate a report based on your sources' },
-  { id: 'slides', label: 'Slide deck', icon: Presentation, color: 'text-purple-300', tint: 'bg-transparent', enabled: true, tooltip: 'Generate a slide deck based on your sources' },
-  { id: 'flashcards', label: 'Flashcards', icon: Layers, color: 'text-amber-300', tint: 'bg-transparent', enabled: true, tooltip: 'Generate flashcards based on your sources' },
-  { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-blue-400', tint: 'bg-transparent', enabled: true, tooltip: 'Generate a quiz based on your sources' },
-  { id: 'datatable', label: 'Data table', icon: Table, color: 'text-[#a8c7fa]', tint: 'bg-transparent', enabled: true, tooltip: 'Generate a data table based on your sources' },
-  { id: 'video', label: 'Video Overview', icon: Video, color: 'text-emerald-400', tint: 'bg-transparent', enabled: false, tooltip: 'Generate a Video Overview based on your sources' },
-  { id: 'audio', label: 'Audio Overview', icon: Sparkles, color: 'text-[#a8c7fa]', tint: 'bg-transparent', enabled: false, tooltip: 'Generate an AI podcast based on your sources' },
-  { id: 'mindmap', label: 'Mind Map', icon: GitBranch, color: 'text-cyan-400', tint: 'bg-transparent', enabled: false, tooltip: 'Generate a mind map based on your sources' },
-  { id: 'infographic', label: 'Infographic', icon: BarChart3, color: 'text-amber-400', tint: 'bg-transparent', enabled: false, tooltip: 'Generate an AI infographic based on your sources' },
+  { id: 'audio', label: 'Audio Overview', icon: Sparkles, color: 'text-[#a8c7fa]', tint: 'bg-[#a8c7fa]/15', enabled: false, tooltip: 'Generate an AI podcast based on your sources' },
+  { id: 'slides', label: 'Slide deck', icon: Presentation, color: 'text-purple-500', tint: 'bg-purple-500/15', enabled: true, tooltip: 'Generate a slide deck based on your sources' },
+  { id: 'video', label: 'Video Overview', icon: Video, color: 'text-emerald-400', tint: 'bg-emerald-500/15', enabled: false, tooltip: 'Generate a Video Overview based on your sources' },
+  { id: 'mindmap', label: 'Mind Map', icon: GitBranch, color: 'text-cyan-400', tint: 'bg-cyan-500/15', enabled: false, tooltip: 'Generate a mind map based on your sources' },
+  { id: 'report', label: 'Reports', icon: FileSpreadsheet, color: 'text-rose-400', tint: 'bg-rose-500/15', enabled: true, tooltip: 'Generate a report based on your sources' },
+  { id: 'flashcards', label: 'Flashcards', icon: Layers, color: 'text-amber-600', tint: 'bg-amber-500/15', enabled: true, tooltip: 'Generate flashcards based on your sources' },
+  { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-blue-400', tint: 'bg-blue-500/15', enabled: true, tooltip: 'Generate a quiz based on your sources' },
+  { id: 'infographic', label: 'Infographic', icon: BarChart3, color: 'text-amber-400', tint: 'bg-amber-400/15', enabled: false, tooltip: 'Generate an AI infographic based on your sources' },
+  { id: 'datatable', label: 'Data table', icon: Table, color: 'text-[#a8c7fa]', tint: 'bg-[#a8c7fa]/15', enabled: true, tooltip: 'Generate a data table based on your sources' },
 ];
 
 function relativeTime(iso: string): string {
@@ -184,7 +184,7 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
 
   if (collapsed) {
     return (
-      <div className="w-12 rounded-3xl bg-[#1e1f20] border border-[#3c4043]/30 flex flex-col items-center py-4 space-y-4 select-none shrink-0">
+      <div className="w-12 rounded-3xl bg-notebook-card border border-notebook-border/60 flex flex-col items-center py-4 space-y-4 select-none shrink-0">
         <button
           onClick={() => setCollapsed(false)}
           className="p-2 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
@@ -203,8 +203,8 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
     <aside
       ref={asideRef}
       style={manualWidth ? { width: manualWidth } : undefined}
-      className={`${manualWidth ? '' : isPanelExpanded ? 'w-[480px]' : 'w-[350px]'
-        } rounded-3xl bg-[#1e1f20] border border-[#3c4043]/30 flex flex-col h-full select-none relative shrink-0 overflow-hidden ${manualWidth ? '' : 'transition-all duration-200'
+      className={`${manualWidth ? '' : isPanelExpanded ? 'w-full md:w-[480px]' : 'w-full md:w-[350px]'
+        } rounded-3xl bg-notebook-card flex flex-col h-full select-none relative shrink-0 overflow-hidden ${manualWidth ? '' : 'transition-all duration-200'
         }`}
     >
       {/* Resize Handle */}
@@ -223,13 +223,13 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
                 setSelectedArtifact(null);
                 setActiveNote(null);
               }}
-              className="text-[#c4c7c5] hover:text-white transition-colors"
+              className="text-notebook-muted hover:text-notebook-text transition-colors"
               title="Return to Studio overview"
             >
               Studio
             </button>
-            <ChevronRight className="w-3.5 h-3.5 text-[#80868b]" />
-            <span className="text-white font-normal">
+            <ChevronRight className="w-3.5 h-3.5 text-notebook-subtle" />
+            <span className="text-notebook-text font-normal">
               {activeNote !== null
                 ? 'Note'
                 : selectedArtifact?.type === 'report'
@@ -246,7 +246,7 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
             </span>
           </div>
         ) : (
-          <h2 className="text-[#e3e3e3] font-medium text-sm">Studio</h2>
+          <h2 className="text-notebook-text font-medium text-sm">Studio</h2>
         )}
         <div className="flex items-center space-x-1">
           {isPanelExpanded ? (
@@ -256,7 +256,7 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
                   const expandBtn = document.getElementById('studio-artifact-maximize-btn');
                   if (expandBtn) expandBtn.click();
                 }}
-                className="p-1.5 text-[#c4c7c5] hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                className="p-1.5 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-lg transition-colors"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
               </button>
@@ -298,8 +298,8 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
           )}
 
           {/* Multilingual Audio Overview Banner */}
-          <div className="text-[11px] text-notebook-muted leading-relaxed px-1">
-            <span>Create an Audio Overview in: </span>
+          <div className="text-[11px] text-notebook-text leading-relaxed px-3 py-2.5 rounded-xl bg-[#a8c7fa]/10 border border-[#a8c7fa]/20">
+            <span className="font-medium">Create an Audio Overview in: </span>
             <span className="text-[#a8c7fa]/90">हिन्दी, বাংলা, ગુજરાતી, ಕನ್ನಡ, മലയാളം, मराठी, ਪੰਜਾਬੀ, தமிழ், తెలుగు</span>
           </div>
 
@@ -309,25 +309,30 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
               const IconComponent = tool.icon;
               const isGenerating = generatingType === tool.id;
               return (
-                <Tooltip key={tool.id} content={tool.tooltip} position="bottom">
+                <Tooltip
+                  key={tool.id}
+                  content={tool.tooltip}
+                  position="bottom"
+                  className={tool.id === 'datatable' ? 'col-span-2' : ''}
+                >
                   <button
                     onClick={() => tool.enabled && setConfiguringTool(tool)}
                     disabled={!tool.enabled || generatingType !== null}
-                    className={`w-full bg-[#28292a] hover:bg-[#333537] border border-white/5 rounded-full px-3 py-2 flex items-center gap-2 text-left transition-all ${tool.enabled
-                        ? 'cursor-pointer hover:border-white/10'
+                    className={`w-full bg-notebook-hover hover:bg-notebook-active rounded-full px-3 py-2 flex items-center gap-2 text-left transition-all ${tool.enabled
+                        ? 'cursor-pointer'
                         : 'opacity-70 cursor-pointer'
-                      } disabled:hover:bg-[#28292a]`}
+                      } disabled:hover:bg-notebook-hover`}
                   >
                     {isGenerating ? (
                       <Loader2 className={`w-3.5 h-3.5 animate-spin shrink-0 ${tool.color}`} />
                     ) : (
                       <IconComponent className={`w-3.5 h-3.5 shrink-0 ${tool.color}`} />
                     )}
-                    <span className="text-[10.5px] font-medium text-[#e3e3e3] truncate">
+                    <span className="text-[10.5px] font-medium text-notebook-text truncate">
                       {tool.label}
                     </span>
                     {['audio', 'video', 'mindmap', 'infographic'].includes(tool.id) && (
-                      <span className="text-[8px] font-medium text-notebook-muted bg-[#3c4043]/90 border border-white/10 px-1.5 py-0.5 rounded-full ml-auto shrink-0 leading-none whitespace-nowrap">
+                      <span className="text-[8px] font-medium text-notebook-muted bg-notebook-active/90 px-1.5 py-0.5 rounded-full ml-auto shrink-0 leading-none whitespace-nowrap">
                         Coming soon
                       </span>
                     )}
@@ -408,7 +413,7 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
               <Sparkles className="w-5 h-5 text-notebook-subtle" />
               <p className="text-xs font-medium text-notebook-text">Studio output will be saved here.</p>
               <p className="text-[11px] text-notebook-muted leading-relaxed max-w-[200px]">
-                Click a tile above to generate content from your sources.
+                After adding sources, click to add Audio Overview, study guide, mind map and more!
               </p>
             </div>
           )}
@@ -433,7 +438,7 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
         <div className="p-3 pt-0 flex justify-end shrink-0">
           <button
             onClick={() => setActiveNote('new')}
-            className="flex items-center gap-1.5 bg-[#28292a] hover:bg-[#333537] text-notebook-text text-xs font-medium py-2 px-3.5 rounded-full border border-white/10 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 bg-notebook-hover hover:bg-notebook-active text-notebook-text text-xs font-medium py-2 px-3.5 rounded-full transition-colors shadow-sm"
           >
             <StickyNote className="w-3.5 h-3.5 text-amber-300" />
             <span>Add note</span>

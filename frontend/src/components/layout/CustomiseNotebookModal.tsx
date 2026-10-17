@@ -159,7 +159,7 @@ export const CustomiseNotebookModal: React.FC<CustomiseNotebookModalProps> = ({
           <button
             onClick={handleDone}
             disabled={saving}
-            className="bg-notebook-text hover:bg-white text-notebook-bg text-xs font-semibold px-4 py-2 rounded-full transition-colors disabled:opacity-60 flex items-center space-x-1.5"
+            className="bg-notebook-text hover:opacity-90 text-notebook-bg text-xs font-semibold px-4 py-2 rounded-full transition-colors disabled:opacity-60 flex items-center space-x-1.5"
           >
             {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
             <span>Done</span>

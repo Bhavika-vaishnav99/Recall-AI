@@ -18,9 +18,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <link rel="icon" href="/logo.png" type="image/png" sizes="any" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.add('light');}}catch(e){}})();`,
+          }}
+        />
       </head>
       <body className="bg-notebook-bg text-notebook-text antialiased select-none">
         <AuthProvider>{children}</AuthProvider>

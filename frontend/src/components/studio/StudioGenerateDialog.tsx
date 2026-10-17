@@ -216,7 +216,7 @@ export const StudioGenerateDialog: React.FC<StudioGenerateDialogProps> = ({
             <div className="space-y-2.5">
               <p className="text-sm text-notebook-text flex items-center gap-2">
                 <span>Question types</span>
-                <span className="text-[10px] font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30 rounded-full px-2 py-0.5">
+                <span className="text-[10px] font-semibold text-sky-600 bg-sky-500/15 border border-sky-500/30 rounded-full px-2 py-0.5">
                   New!
                 </span>
               </p>
@@ -308,7 +308,7 @@ export const StudioGenerateDialog: React.FC<StudioGenerateDialogProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-4 border-t border-notebook-border flex items-center justify-between gap-4 shrink-0">
+        <div className="px-5 py-4 border-t border-notebook-border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 shrink-0">
           {/* AI usage: generations already run in this notebook today */}
           <div className="flex items-center gap-3 min-w-0">
             <span className="text-[11px] text-notebook-muted shrink-0">AI usage</span>
@@ -341,14 +341,14 @@ export const StudioGenerateDialog: React.FC<StudioGenerateDialogProps> = ({
               onClick={() => onGenerate(options, true)}
               disabled={!canGenerate}
               title="Queue this for the next off-peak window"
-              className="text-xs font-medium text-notebook-text px-4 py-2.5 rounded-full border border-notebook-border hover:bg-notebook-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 sm:flex-initial text-xs font-medium text-notebook-text px-4 py-2.5 rounded-full border border-notebook-border hover:bg-notebook-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Generate later
             </button>
             <button
               onClick={() => onGenerate(options, false)}
               disabled={!canGenerate}
-              className="flex items-center gap-2 bg-[#004a77] hover:bg-[#004a77]/80 text-[#a8c7fa] border border-[#a8c7fa]/20 text-xs font-semibold px-5 py-2.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-[#004a77] hover:bg-[#004a77]/80 text-[#a8c7fa] border border-[#a8c7fa]/20 text-xs font-semibold px-5 py-2.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {generating && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>{generating ? 'Generating…' : 'Generate now'}</span>

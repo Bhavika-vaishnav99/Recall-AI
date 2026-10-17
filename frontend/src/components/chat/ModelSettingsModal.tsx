@@ -24,28 +24,28 @@ const AVAILABLE_MODELS = [
     name: 'Gemini 2.5 Flash',
     tag: 'Recommended',
     description: 'Fast, state-of-the-art multimodal model optimized for low latency and high quality.',
-    badgeColor: 'bg-[#a8c7fa]/10 text-[#c2d9fb] border-[#a8c7fa]/30',
+    badgeColor: 'bg-[#a8c7fa]/15 text-notebook-text border-[#a8c7fa]/40',
   },
   {
     id: 'Gemini 1.5 Pro',
     name: 'Gemini 1.5 Pro',
     tag: 'Complex Reasoning',
     description: 'Best for complex multi-step reasoning, deep synthesis across large documents, and coding.',
-    badgeColor: 'bg-[#a8c7fa]/10 text-[#a8c7fa] border-[#a8c7fa]/30',
+    badgeColor: 'bg-[#a8c7fa]/15 text-notebook-text border-[#a8c7fa]/40',
   },
   {
     id: 'Gemini 1.5 Flash',
     name: 'Gemini 1.5 Flash',
     tag: 'Fast & Light',
     description: 'Lightweight model tuned for speed and efficiency on standard QA and summaries.',
-    badgeColor: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+    badgeColor: 'bg-sky-500/20 text-sky-600 border-sky-500/30',
   },
   {
     id: 'Gemini 2.0 Flash',
     name: 'Gemini 2.0 Flash',
     tag: 'Experimental',
     description: 'Next-gen experimental flash model with ultra-fast responsiveness.',
-    badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    badgeColor: 'bg-amber-500/20 text-amber-600 border-amber-500/30',
   },
 ];
 
