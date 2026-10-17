@@ -193,12 +193,12 @@ export const SourcesPanel: React.FC<SourcesPanelProps> = ({
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center space-x-1.5">
               <Tooltip content="Web" position="bottom">
-                <button className="w-6 h-6 rounded-full bg-notebook-hover hover:bg-notebook-active flex items-center justify-center text-notebook-muted hover:text-notebook-text border border-notebook-border/50 transition-colors">
+                <button className="w-6 h-6 rounded-full bg-notebook-hover hover:bg-notebook-active flex items-center justify-center text-notebook-muted hover:text-notebook-text transition-colors">
                   <Globe className="w-3 h-3" />
                 </button>
               </Tooltip>
               <Tooltip content="Fast research" position="bottom">
-                <button className="w-6 h-6 rounded-full bg-notebook-hover hover:bg-notebook-active flex items-center justify-center text-notebook-muted hover:text-notebook-text border border-notebook-border/50 transition-colors">
+                <button className="w-6 h-6 rounded-full bg-notebook-hover hover:bg-notebook-active flex items-center justify-center text-notebook-muted hover:text-notebook-text transition-colors">
                   <Sparkles className="w-3 h-3" />
                 </button>
               </Tooltip>

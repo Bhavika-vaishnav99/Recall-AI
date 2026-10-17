@@ -56,15 +56,15 @@ interface StudioTool {
 
 // NotebookLM tools ordered matching reference UI
 const studioTools: StudioTool[] = [
+  { id: 'report', label: 'Reports', icon: FileSpreadsheet, color: 'text-rose-400', tint: 'bg-rose-500/15', enabled: true, tooltip: 'Generate a report based on your sources' },
   { id: 'audio', label: 'Audio Overview', icon: Sparkles, color: 'text-[#a8c7fa]', tint: 'bg-[#a8c7fa]/15', enabled: false, tooltip: 'Generate an AI podcast based on your sources' },
   { id: 'slides', label: 'Slide deck', icon: Presentation, color: 'text-purple-500', tint: 'bg-purple-500/15', enabled: true, tooltip: 'Generate a slide deck based on your sources' },
   { id: 'video', label: 'Video Overview', icon: Video, color: 'text-emerald-400', tint: 'bg-emerald-500/15', enabled: false, tooltip: 'Generate a Video Overview based on your sources' },
-  { id: 'mindmap', label: 'Mind Map', icon: GitBranch, color: 'text-cyan-400', tint: 'bg-cyan-500/15', enabled: false, tooltip: 'Generate a mind map based on your sources' },
-  { id: 'report', label: 'Reports', icon: FileSpreadsheet, color: 'text-rose-400', tint: 'bg-rose-500/15', enabled: true, tooltip: 'Generate a report based on your sources' },
   { id: 'flashcards', label: 'Flashcards', icon: Layers, color: 'text-amber-600', tint: 'bg-amber-500/15', enabled: true, tooltip: 'Generate flashcards based on your sources' },
-  { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-blue-400', tint: 'bg-blue-500/15', enabled: true, tooltip: 'Generate a quiz based on your sources' },
-  { id: 'infographic', label: 'Infographic', icon: BarChart3, color: 'text-amber-400', tint: 'bg-amber-400/15', enabled: false, tooltip: 'Generate an AI infographic based on your sources' },
+  { id: 'mindmap', label: 'Mind Map', icon: GitBranch, color: 'text-cyan-400', tint: 'bg-cyan-500/15', enabled: false, tooltip: 'Generate a mind map based on your sources' },
   { id: 'datatable', label: 'Data table', icon: Table, color: 'text-[#a8c7fa]', tint: 'bg-[#a8c7fa]/15', enabled: true, tooltip: 'Generate a data table based on your sources' },
+  { id: 'infographic', label: 'Infographic', icon: BarChart3, color: 'text-amber-400', tint: 'bg-amber-400/15', enabled: false, tooltip: 'Generate an AI infographic based on your sources' },
+  { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-blue-400', tint: 'bg-blue-500/15', enabled: true, tooltip: 'Generate a quiz based on your sources' },
 ];
 
 function relativeTime(iso: string): string {
@@ -80,6 +80,16 @@ function relativeTime(iso: string): string {
 
 export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCount = 0 }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDark(!document.documentElement.classList.contains('light'));
+    };
+    checkTheme();
+    window.addEventListener('themechange', checkTheme);
+    return () => window.removeEventListener('themechange', checkTheme);
+  }, []);
   const [artifacts, setArtifacts] = useState<StudioArtifact[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
@@ -233,16 +243,16 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
               {activeNote !== null
                 ? 'Note'
                 : selectedArtifact?.type === 'report'
-                ? 'Interactive Report'
-                : selectedArtifact?.type === 'slides'
-                ? 'Slide Deck'
-                : selectedArtifact?.type === 'quiz'
-                ? 'Quiz'
-                : selectedArtifact?.type === 'flashcards'
-                ? 'Flashcards'
-                : selectedArtifact?.type === 'datatable'
-                ? 'Data Table'
-                : 'Interactive Report'}
+                  ? 'Interactive Report'
+                  : selectedArtifact?.type === 'slides'
+                    ? 'Slide Deck'
+                    : selectedArtifact?.type === 'quiz'
+                      ? 'Quiz'
+                      : selectedArtifact?.type === 'flashcards'
+                        ? 'Flashcards'
+                        : selectedArtifact?.type === 'datatable'
+                          ? 'Data Table'
+                          : 'Interactive Report'}
             </span>
           </div>
         ) : (
@@ -313,14 +323,14 @@ export const StudioPanel: React.FC<StudioPanelProps> = ({ notebookId, sourcesCou
                   key={tool.id}
                   content={tool.tooltip}
                   position="bottom"
-                  className={tool.id === 'datatable' ? 'col-span-2' : ''}
+                  className={tool.id === 'datatable' ? 'col-span-1' : ''}
                 >
                   <button
                     onClick={() => tool.enabled && setConfiguringTool(tool)}
                     disabled={!tool.enabled || generatingType !== null}
-                    className={`w-full bg-notebook-hover hover:bg-notebook-active rounded-full px-3 py-2 flex items-center gap-2 text-left transition-all ${tool.enabled
-                        ? 'cursor-pointer'
-                        : 'opacity-70 cursor-pointer'
+                    className={`w-full bg-black hover:bg-zinc-900 rounded-full px-3 py-2 flex items-center gap-2 text-left transition-all ${tool.enabled
+                      ? 'cursor-pointer'
+                      : 'opacity-70 cursor-pointer'
                       } disabled:hover:bg-notebook-hover`}
                   >
                     {isGenerating ? (

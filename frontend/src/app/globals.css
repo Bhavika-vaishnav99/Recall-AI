@@ -24,22 +24,22 @@
 }
 
 html.light {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f5e2cd;
+  --foreground: #3a2414;
 
-  --notebook-bg: #f8fafc;
-  --notebook-card: #ffffff;
-  --notebook-hover: #f1f5f9;
-  --notebook-border: #e2e8f0;
-  --notebook-active: #cbd5e1;
-  --notebook-text: #0f172a;
-  --notebook-muted: #64748b;
-  --notebook-subtle: #94a3b8;
+  --notebook-bg: #f5e2cd;
+  --notebook-card: #fbead9;
+  --notebook-hover: #f5cfa3;
+  --notebook-border: #e0ad74;
+  --notebook-active: #e8993f;
+  --notebook-text: #3a2414;
+  --notebook-muted: #74503a;
+  --notebook-subtle: #96694a;
 
   --accent-blue: #1a6fa8;
   --accent-blue-dim: #0f5a8a;
   --accent-green: #1f9d55;
-  --accent-surface: #eef2f7;
+  --accent-surface: #f5d9bc;
 }
 
 body {

@@ -479,7 +479,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
             />
 
             <div className="flex items-center space-x-2.5">
-              <span className="text-[11px] font-medium text-notebook-muted bg-notebook-bg px-3 py-1 rounded-full border border-notebook-border/50">
+              <span className="text-[11px] font-medium text-notebook-muted bg-notebook-bg px-3 py-1 rounded-full">
                 {sourcesCount} source{sourcesCount !== 1 ? 's' : ''}
               </span>
 

@@ -199,12 +199,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-notebook-muted" />
               </div>
               <div className="flex flex-wrap items-center gap-2 px-3 pb-3 pt-1">
-                <button className="flex items-center space-x-1.5 text-xs text-notebook-text bg-notebook-hover hover:bg-notebook-active px-3 py-1.5 rounded-full transition-colors font-medium border border-notebook-border/50">
+                <button className="flex items-center space-x-1.5 text-xs text-notebook-text bg-notebook-hover hover:bg-notebook-active px-3 py-1.5 rounded-full transition-colors font-medium">
                   <Globe className="w-3.5 h-3.5" />
                   <span>Web</span>
                   <ChevronDown className="w-3 h-3 text-notebook-muted ml-1" />
                 </button>
-                <button className="flex items-center space-x-1.5 text-xs text-notebook-text bg-notebook-hover hover:bg-notebook-active px-3 py-1.5 rounded-full transition-colors font-medium border border-notebook-border/50">
+                <button className="flex items-center space-x-1.5 text-xs text-notebook-text bg-notebook-hover hover:bg-notebook-active px-3 py-1.5 rounded-full transition-colors font-medium">
                   <Zap className="w-3.5 h-3.5" />
                   <span>Fast research</span>
                   <ChevronDown className="w-3 h-3 text-notebook-muted ml-1" />

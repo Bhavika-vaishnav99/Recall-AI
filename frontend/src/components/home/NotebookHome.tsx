@@ -15,6 +15,8 @@ import {
   HelpCircle,
   Folder,
   LogOut,
+  UserPlus,
+  User,
 } from 'lucide-react';
 import {
   fetchNotebooks,
@@ -36,6 +38,7 @@ export const NotebookHome: React.FC = () => {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
@@ -168,7 +171,7 @@ export const NotebookHome: React.FC = () => {
             <span className="hidden sm:inline">Settings</span>
           </button>
 
-          <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full bg-notebook-card border border-amber-500/30 text-[10px] font-bold text-amber-500 tracking-wider">
+          <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full bg-notebook-card border border-amber-500/30 text-[10px] font-bold text-amber-500 tracking-wider opacity-50 cursor-default select-none">
             PRO
           </span>
 
@@ -176,19 +179,50 @@ export const NotebookHome: React.FC = () => {
             <Grid className="w-4 h-4" />
           </button>
 
-          <button
-            onClick={logout}
-            className="p-2 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-full transition-colors"
-            title="Log out"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          <div className="relative shrink-0">
+            <button
+              onClick={() => setIsAccountMenuOpen((prev) => !prev)}
+              className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#004a77] to-[#1a6fa8] flex items-center justify-center text-white text-xs font-semibold ring-2 ring-notebook-border"
+            >
+              {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+            </button>
 
-          <div
-            className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#004a77] to-[#1a6fa8] flex items-center justify-center text-white text-xs font-semibold ring-2 ring-notebook-border shrink-0"
-            title={user?.email}
-          >
-            {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+            {isAccountMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setIsAccountMenuOpen(false)} />
+                <div className="absolute right-0 top-10 w-64 bg-notebook-card rounded-2xl shadow-2xl z-40 overflow-hidden animate-fadeIn">
+                  <div className="p-4 flex items-center space-x-3 border-b border-notebook-border/40">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#004a77] to-[#1a6fa8] flex items-center justify-center text-[#a8c7fa] text-sm font-semibold shrink-0">
+                      {user?.name || user?.email ? (user.name || user.email).charAt(0).toUpperCase() : <User className="w-4 h-4" />}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-notebook-text truncate">{user?.name || 'Account'}</p>
+                      <p className="text-xs text-notebook-muted truncate">{user?.email}</p>
+                    </div>
+                  </div>
+                  <div className="py-1.5">
+                    <button
+                      disabled
+                      title="Multiple accounts aren't supported yet"
+                      className="w-full flex items-center space-x-2.5 px-4 py-2.5 text-sm text-notebook-muted opacity-50 cursor-default"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      <span>Add another account</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsAccountMenuOpen(false);
+                        logout();
+                      }}
+                      className="w-full flex items-center space-x-2.5 px-4 py-2.5 text-sm text-notebook-text hover:bg-notebook-hover transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign out</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </header>

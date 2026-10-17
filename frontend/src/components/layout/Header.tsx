@@ -12,10 +12,12 @@ import {
   Check,
   ArrowLeft,
   Loader2,
-  Grid3x3,
+  UserPlus,
+  LogOut,
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { createNotebook } from '@/modules/notebooks/api';
+import { useAuth } from '@/modules/auth/AuthContext';
 import { ShareNotebookModal } from './ShareNotebookModal';
 import { SettingsModal } from './SettingsModal';
 
@@ -29,6 +31,8 @@ export const Header: React.FC<HeaderProps> = ({
   setNotebookTitle,
 }) => {
   const router = useRouter();
+  const { user, logout } = useAuth();
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [creatingNotebook, setCreatingNotebook] = useState(false);
@@ -130,26 +134,56 @@ export const Header: React.FC<HeaderProps> = ({
         </Tooltip>
 
         {/* PRO Label */}
-        <Tooltip content="Pro plan active" position="bottom">
-          <span className="hidden sm:inline-block text-[10px] font-semibold tracking-wider text-notebook-muted border border-notebook-border px-2 py-0.5 rounded-full cursor-pointer hover:border-notebook-subtle transition-colors">
-            PRO
-          </span>
-        </Tooltip>
-
-        <Tooltip content="Google & Recall apps" position="bottom">
-          <button
-            className="hidden sm:inline-flex p-2 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-full transition-colors duration-150"
-          >
-            <Grid3x3 className="w-4 h-4" />
-          </button>
-        </Tooltip>
+        <span className="hidden sm:inline-block text-[10px] font-semibold tracking-wider text-notebook-muted border border-notebook-border px-2 py-0.5 rounded-full opacity-50 cursor-default select-none">
+          PRO
+        </span>
 
         {/* User Profile Avatar */}
-        <Tooltip content="User account" position="bottom">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#004a77] to-[#1a6fa8] flex items-center justify-center text-[#a8c7fa] text-xs font-semibold ring-1 ring-notebook-border ml-1 cursor-pointer hover:ring-[#a8c7fa]/40 transition-all shrink-0">
-            <User className="w-3.5 h-3.5" />
-          </div>
-        </Tooltip>
+        <div className="relative shrink-0">
+          <button
+            onClick={() => setIsAccountMenuOpen((prev) => !prev)}
+            className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#004a77] to-[#1a6fa8] flex items-center justify-center text-[#a8c7fa] text-xs font-semibold ring-1 ring-notebook-border ml-1 cursor-pointer hover:ring-[#a8c7fa]/40 transition-all"
+          >
+            {user?.name || user?.email ? (user.name || user.email).charAt(0).toUpperCase() : <User className="w-3.5 h-3.5" />}
+          </button>
+
+          {isAccountMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-30" onClick={() => setIsAccountMenuOpen(false)} />
+              <div className="absolute right-0 top-10 w-64 bg-notebook-card rounded-2xl shadow-2xl z-40 overflow-hidden animate-fadeIn">
+                <div className="p-4 flex items-center space-x-3 border-b border-notebook-border/40">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#004a77] to-[#1a6fa8] flex items-center justify-center text-[#a8c7fa] text-sm font-semibold shrink-0">
+                    {user?.name || user?.email ? (user.name || user.email).charAt(0).toUpperCase() : <User className="w-4 h-4" />}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-notebook-text truncate">{user?.name || 'Account'}</p>
+                    <p className="text-xs text-notebook-muted truncate">{user?.email}</p>
+                  </div>
+                </div>
+                <div className="py-1.5">
+                  <button
+                    disabled
+                    title="Multiple accounts aren't supported yet"
+                    className="w-full flex items-center space-x-2.5 px-4 py-2.5 text-sm text-notebook-muted opacity-50 cursor-default"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>Add another account</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsAccountMenuOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-4 py-2.5 text-sm text-notebook-text hover:bg-notebook-hover transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign out</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {isShareOpen && (
