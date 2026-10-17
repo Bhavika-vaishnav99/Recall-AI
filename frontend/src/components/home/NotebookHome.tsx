@@ -14,6 +14,7 @@ import {
   BookOpen,
   HelpCircle,
   Folder,
+  LogOut,
 } from 'lucide-react';
 import {
   fetchNotebooks,
@@ -22,10 +23,12 @@ import {
   renameNotebook,
   Notebook,
 } from '@/modules/notebooks/api';
+import { useAuth } from '@/modules/auth/AuthContext';
 import { SettingsModal } from '../layout/SettingsModal';
 
 export const NotebookHome: React.FC = () => {
   const router = useRouter();
+  const { user, logout } = useAuth();
   const [notebooks, setNotebooks] = useState<Notebook[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -162,8 +165,19 @@ export const NotebookHome: React.FC = () => {
             <Grid className="w-4 h-4" />
           </button>
 
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#004a77] to-[#1a6fa8] flex items-center justify-center text-white text-xs font-semibold ring-2 ring-notebook-border">
-            U
+          <button
+            onClick={logout}
+            className="p-2 text-notebook-muted hover:text-notebook-text hover:bg-notebook-hover rounded-full transition-colors"
+            title="Log out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+
+          <div
+            className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#004a77] to-[#1a6fa8] flex items-center justify-center text-white text-xs font-semibold ring-2 ring-notebook-border"
+            title={user?.email}
+          >
+            {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
           </div>
         </div>
       </header>

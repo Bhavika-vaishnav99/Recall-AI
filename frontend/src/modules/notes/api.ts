@@ -1,3 +1,5 @@
+import { authFetch } from '@/lib/apiClient';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface Note {
@@ -10,7 +12,7 @@ export interface Note {
 }
 
 export async function fetchNotes(notebookId: string): Promise<Note[]> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}/notes`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}/notes`, {
     cache: 'no-store',
   });
   if (!response.ok) {
@@ -24,7 +26,7 @@ export async function createNote(
   title: string,
   content: string
 ): Promise<Note> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}/notes`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}/notes`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title, content }),
@@ -39,7 +41,7 @@ export async function updateNote(
   noteId: string,
   updates: { title?: string; content?: string }
 ): Promise<Note> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notes/${noteId}`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notes/${noteId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(updates),
@@ -51,7 +53,7 @@ export async function updateNote(
 }
 
 export async function deleteNote(noteId: string): Promise<boolean> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notes/${noteId}`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notes/${noteId}`, {
     method: 'DELETE',
   });
   if (!response.ok) {

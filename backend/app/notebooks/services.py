@@ -17,55 +17,6 @@ _SUMMARY_SYSTEM_INSTRUCTION = (
 )
 
 
-async def _backfill_untracked_notebooks() -> None:
-    """
-    Older data may reference a notebook_id in `sources` that has no matching
-    document in the `notebooks` collection (notebooks were introduced after
-    sources/chat existed). Create a placeholder notebook record for any such
-    orphaned notebook_id so it shows up in the notebook list.
-    """
-    known_ids = {doc["_id"] async for doc in db.db.notebooks.find({}, {"_id": 1})}
-    # notebook_id fields are stored as plain strings, but our notebook _id is
-    # an ObjectId. A "known" notebook_id must match str(ObjectId) to be linked.
-    known_id_strs = {str(_id) for _id in known_ids}
-
-    source_notebook_ids = await db.db.sources.distinct("notebook_id")
-    orphaned = [nid for nid in source_notebook_ids if nid and nid not in known_id_strs]
-
-    for notebook_id in orphaned:
-        first_source = await db.db.sources.find_one(
-            {"notebook_id": notebook_id}, sort=[("created_at", 1)]
-        )
-        created_at = (first_source or {}).get("created_at") or datetime.now(timezone.utc).isoformat()
-        try:
-            obj_id = ObjectId(notebook_id)
-        except Exception:
-            # Legacy non-ObjectId notebook ids (e.g. "default_notebook_1") can't be
-            # used as the notebooks collection's _id; store the literal id instead.
-            existing = await db.db.notebooks.find_one({"legacy_id": notebook_id})
-            if existing:
-                continue
-            await db.db.notebooks.insert_one({
-                "legacy_id": notebook_id,
-                "title": "Untitled notebook",
-                "created_at": created_at,
-                "updated_at": created_at,
-            })
-            continue
-
-        await db.db.notebooks.update_one(
-            {"_id": obj_id},
-            {
-                "$setOnInsert": {
-                    "title": "Untitled notebook",
-                    "created_at": created_at,
-                    "updated_at": created_at,
-                }
-            },
-            upsert=True,
-        )
-
-
 def _notebook_id_str(doc: dict) -> str:
     return doc.get("legacy_id") or str(doc["_id"])
 
@@ -85,10 +36,11 @@ async def _build_notebook_response(doc: dict) -> dict:
     }
 
 
-async def create_notebook(title: Optional[str] = None) -> dict:
-    """Create a new notebook workspace."""
+async def create_notebook(user_id: str, title: Optional[str] = None) -> dict:
+    """Create a new notebook workspace owned by the given user."""
     now_iso = datetime.now(timezone.utc).isoformat()
     notebook_doc = {
+        "user_id": user_id,
         "title": (title or "Untitled notebook").strip() or "Untitled notebook",
         "created_at": now_iso,
         "updated_at": now_iso,
@@ -98,36 +50,39 @@ async def create_notebook(title: Optional[str] = None) -> dict:
     return await _build_notebook_response(notebook_doc)
 
 
-async def list_notebooks() -> List[dict]:
-    """List all notebooks, most recently updated first, with source counts."""
-    await _backfill_untracked_notebooks()
-
+async def list_notebooks(user_id: str) -> List[dict]:
+    """List the given user's notebooks, most recently updated first, with source counts."""
     notebooks = []
-    cursor = db.db.notebooks.find({}).sort("updated_at", -1)
+    cursor = db.db.notebooks.find({"user_id": user_id}).sort("updated_at", -1)
     async for doc in cursor:
         notebooks.append(await _build_notebook_response(doc))
     return notebooks
 
 
-async def _find_notebook_doc(notebook_id: str) -> Optional[dict]:
+async def _find_notebook_doc(notebook_id: str, user_id: str) -> Optional[dict]:
     try:
-        doc = await db.db.notebooks.find_one({"_id": ObjectId(notebook_id)})
+        doc = await db.db.notebooks.find_one({"_id": ObjectId(notebook_id), "user_id": user_id})
         if doc:
             return doc
     except Exception:
         pass
-    return await db.db.notebooks.find_one({"legacy_id": notebook_id})
+    return await db.db.notebooks.find_one({"legacy_id": notebook_id, "user_id": user_id})
 
 
-async def get_notebook(notebook_id: str) -> Optional[dict]:
-    doc = await _find_notebook_doc(notebook_id)
+async def notebook_owned_by(notebook_id: str, user_id: str) -> bool:
+    """Used by other modules (sources/chat/studio/notes) to verify notebook ownership."""
+    return await _find_notebook_doc(notebook_id, user_id) is not None
+
+
+async def get_notebook(notebook_id: str, user_id: str) -> Optional[dict]:
+    doc = await _find_notebook_doc(notebook_id, user_id)
     if not doc:
         return None
     return await _build_notebook_response(doc)
 
 
-async def rename_notebook(notebook_id: str, title: str) -> Optional[dict]:
-    doc = await _find_notebook_doc(notebook_id)
+async def rename_notebook(notebook_id: str, user_id: str, title: str) -> Optional[dict]:
+    doc = await _find_notebook_doc(notebook_id, user_id)
     if not doc:
         return None
 
@@ -137,7 +92,7 @@ async def rename_notebook(notebook_id: str, title: str) -> Optional[dict]:
         {"_id": doc["_id"]},
         {"$set": {"title": clean_title, "updated_at": now_iso}},
     )
-    return await get_notebook(notebook_id)
+    return await get_notebook(notebook_id, user_id)
 
 
 MAX_COVER_IMAGE_CHARS = 3_000_000  # ~2.2MB binary, base64-encoded
@@ -145,13 +100,14 @@ MAX_COVER_IMAGE_CHARS = 3_000_000  # ~2.2MB binary, base64-encoded
 
 async def customize_notebook(
     notebook_id: str,
+    user_id: str,
     title: Optional[str] = None,
     cover_image: Optional[str] = None,
     use_custom_summary: Optional[bool] = None,
     custom_summary_text: Optional[str] = None,
 ) -> Optional[dict]:
     """Update a notebook's title, cover image, and/or custom-summary settings."""
-    doc = await _find_notebook_doc(notebook_id)
+    doc = await _find_notebook_doc(notebook_id, user_id)
     if not doc:
         return None
 
@@ -173,7 +129,7 @@ async def customize_notebook(
         updates["custom_summary_text"] = custom_summary_text
 
     if not updates and not unsets:
-        return await get_notebook(notebook_id)
+        return await get_notebook(notebook_id, user_id)
 
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
     update_op: dict = {"$set": updates}
@@ -181,12 +137,12 @@ async def customize_notebook(
         update_op["$unset"] = unsets
 
     await db.db.notebooks.update_one({"_id": doc["_id"]}, update_op)
-    return await get_notebook(notebook_id)
+    return await get_notebook(notebook_id, user_id)
 
 
-async def delete_notebook(notebook_id: str) -> bool:
+async def delete_notebook(notebook_id: str, user_id: str) -> bool:
     """Delete a notebook and cascade-delete all of its owned data."""
-    doc = await _find_notebook_doc(notebook_id)
+    doc = await _find_notebook_doc(notebook_id, user_id)
     if not doc:
         return False
 
@@ -247,13 +203,13 @@ async def _gather_context_for_summary(notebook_id: str) -> Optional[str]:
     return "\n\n".join(parts) if parts else None
 
 
-async def get_or_generate_notebook_summary(notebook_id: str, force: bool = False) -> Optional[dict]:
+async def get_or_generate_notebook_summary(notebook_id: str, user_id: str, force: bool = False) -> Optional[dict]:
     """
     Return the notebook's cached auto-summary, generating and caching one
     from its active sources' content if none exists yet. Returns None if the
     notebook has no processed/active source content to summarize.
     """
-    doc = await _find_notebook_doc(notebook_id)
+    doc = await _find_notebook_doc(notebook_id, user_id)
     if not doc:
         return None
 
@@ -297,6 +253,7 @@ async def get_or_generate_notebook_summary(notebook_id: str, force: bool = False
 
 async def clear_notebook_summary_cache(notebook_id: str) -> None:
     """Invalidate a notebook's cached auto-summary so it regenerates on next request."""
-    doc = await _find_notebook_doc(notebook_id)
-    if doc:
-        await db.db.notebooks.update_one({"_id": doc["_id"]}, {"$unset": {"summary": ""}})
+    try:
+        await db.db.notebooks.update_one({"_id": ObjectId(notebook_id)}, {"$unset": {"summary": ""}})
+    except Exception:
+        await db.db.notebooks.update_one({"legacy_id": notebook_id}, {"$unset": {"summary": ""}})

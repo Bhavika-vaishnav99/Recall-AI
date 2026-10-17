@@ -1,8 +1,10 @@
 import logging
 from typing import List, Optional
-from fastapi import APIRouter, Path, HTTPException
+from fastapi import APIRouter, Depends, Path, HTTPException
 from pydantic import BaseModel, Field
 
+from app.auth.dependencies import get_current_user
+from app.notebooks.services import notebook_owned_by
 from app.rag.vector_search_service import search_notebook_chunks
 
 logger = logging.getLogger(__name__)
@@ -42,11 +44,14 @@ class SearchResponse(BaseModel):
 async def search_notebook(
     request: SearchRequest,
     notebook_id: str = Path(..., description="ID of the notebook workspace"),
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Search notebook document chunks using vector embeddings.
     Filtered strictly by notebook_id to preserve workspace isolation.
     """
+    if not await notebook_owned_by(notebook_id, str(current_user["_id"])):
+        raise HTTPException(status_code=404, detail="Notebook not found")
     try:
         results = await search_notebook_chunks(
             notebook_id=notebook_id,

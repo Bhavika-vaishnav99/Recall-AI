@@ -1,3 +1,5 @@
+import { authFetch } from '@/lib/apiClient';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface Source {
@@ -37,7 +39,7 @@ export async function uploadSourceFile(
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/sources/upload`,
     {
       method: 'POST',
@@ -54,7 +56,7 @@ export async function uploadSourceFile(
 }
 
 export async function fetchNotebookSources(notebookId: string): Promise<Source[]> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/sources`,
     {
       cache: 'no-store',
@@ -71,7 +73,7 @@ export async function fetchNotebookSources(notebookId: string): Promise<Source[]
 export async function fetchSourceDetail(
   sourceId: string
 ): Promise<SourceDetailResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/sources/${sourceId}`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/sources/${sourceId}`, {
     cache: 'no-store',
   });
 
@@ -86,7 +88,7 @@ export async function deleteSourceFile(
   notebookId: string,
   sourceId: string
 ): Promise<boolean> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/sources/${sourceId}`,
     {
       method: 'DELETE',
@@ -105,7 +107,7 @@ export async function setSourceActive(
   sourceId: string,
   isActive: boolean
 ): Promise<Source> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/sources/${sourceId}/active`,
     {
       method: 'PATCH',
@@ -125,7 +127,7 @@ export async function setAllSourcesActive(
   notebookId: string,
   isActive: boolean
 ): Promise<Source[]> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/sources/select-all`,
     {
       method: 'PATCH',

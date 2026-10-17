@@ -153,12 +153,16 @@ def _build_prompt(artifact_type: str, context: str, options: dict) -> str:
     if artifact_type == "report":
         return (
             "SOURCE MATERIAL:\n" + context + "\n\n"
-            "Write a briefing report summarizing the source material: an overview "
-            f"summary plus {amount} thematic sections. "
+            "Write an engaging briefing document / interactive report summarizing the source material in the exact style of Gemini NotebookLM. "
+            "IMPORTANT FORMATTING RULES:\n"
+            "- 'title': A compelling Title Case headline for the report.\n"
+            "- 'summary': An engaging introductory overview setting up the context and core learning outcomes / takeaways. Format key takeaways as bullet points with bold verbs (e.g., 'By the end of this lesson, you will be able to:\n- **Navigate** core user workflows...\n- **Explain** how AI chatbots...').\n"
+            f"- 'sections': Exactly {amount} rich, in-depth thematic sections. Section headings MUST be in Title Case (e.g. 'Navigating User Access and Chatbot Capabilities', NEVER ALL-CAPS). Each section content must be comprehensive, explanatory prose using Markdown paragraphs and bold keywords.\n"
             f"{_DIFFICULTY_GUIDANCE.get(difficulty, '')}\n" + topic +
             'Respond with JSON: {"title": string, "summary": string, "sections": '
             '[{"heading": string, "content": string}, ...]}'
         )
+
 
     if artifact_type == "slides":
         return (
@@ -170,7 +174,7 @@ def _build_prompt(artifact_type: str, context: str, options: dict) -> str:
         )
 
     if artifact_type == "datatable":
-        return (
+        return ( 
             "SOURCE MATERIAL:\n" + context + "\n\n"
             "Extract the key facts, entities, or comparisons from the source "
             "material into a structured data table (choose sensible columns "

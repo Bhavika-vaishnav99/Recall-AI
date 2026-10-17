@@ -1,3 +1,5 @@
+import { authFetch } from '@/lib/apiClient';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export type StudioArtifactType = 'slides' | 'report' | 'flashcards' | 'quiz' | 'datatable';
@@ -82,7 +84,7 @@ export async function generateStudioArtifact(
   options?: StudioGenerateOptions,
   defer = false
 ): Promise<StudioArtifact> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/studio/generate`,
     {
       method: 'POST',
@@ -98,7 +100,7 @@ export async function generateStudioArtifact(
 }
 
 export async function fetchStudioArtifacts(notebookId: string): Promise<StudioArtifact[]> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}/studio`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}/studio`, {
     cache: 'no-store',
   });
   if (!response.ok) {
@@ -108,7 +110,7 @@ export async function fetchStudioArtifacts(notebookId: string): Promise<StudioAr
 }
 
 export async function deleteStudioArtifact(artifactId: string): Promise<boolean> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/studio/${artifactId}`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/studio/${artifactId}`, {
     method: 'DELETE',
   });
   if (!response.ok) {

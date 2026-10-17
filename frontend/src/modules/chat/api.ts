@@ -1,3 +1,5 @@
+import { authFetch } from '@/lib/apiClient';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface Citation {
@@ -41,7 +43,7 @@ export async function sendChatMessage(
   message: string,
   conversationId?: string
 ): Promise<ChatResponse> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/chat`,
     {
       method: 'POST',
@@ -66,7 +68,7 @@ export async function sendChatMessage(
 export async function fetchNotebookConversations(
   notebookId: string
 ): Promise<Conversation[]> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/chat/conversations`,
     { cache: 'no-store' }
   );
@@ -82,7 +84,7 @@ export async function fetchConversationHistory(
   notebookId: string,
   conversationId: string
 ): Promise<MessageItem[]> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/chat/conversations/${conversationId}`,
     { cache: 'no-store' }
   );
@@ -97,7 +99,7 @@ export async function fetchConversationHistory(
 export async function startNewConversation(
   notebookId: string
 ): Promise<Conversation> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE_URL}/api/v1/notebooks/${notebookId}/chat/conversations/new`,
     { method: 'POST' }
   );

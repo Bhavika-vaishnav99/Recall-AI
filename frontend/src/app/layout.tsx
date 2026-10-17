@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { AuthProvider } from '@/modules/auth/AuthContext';
 
 export const metadata: Metadata = {
   title: 'Recall AI - NotebookLM Inspired AI Knowledge Platform',
@@ -22,7 +23,7 @@ export default function RootLayout({
         <link rel="icon" href="/logo.png" type="image/png" sizes="any" />
       </head>
       <body className="bg-notebook-bg text-notebook-text antialiased select-none">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

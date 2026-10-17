@@ -1,3 +1,5 @@
+import { authFetch } from '@/lib/apiClient';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface Notebook {
@@ -12,7 +14,7 @@ export interface Notebook {
 }
 
 export async function fetchNotebooks(): Promise<Notebook[]> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notebooks`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notebooks`, {
     cache: 'no-store',
   });
   if (!response.ok) {
@@ -22,7 +24,7 @@ export async function fetchNotebooks(): Promise<Notebook[]> {
 }
 
 export async function fetchNotebook(notebookId: string): Promise<Notebook> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}`, {
     cache: 'no-store',
   });
   if (!response.ok) {
@@ -32,7 +34,7 @@ export async function fetchNotebook(notebookId: string): Promise<Notebook> {
 }
 
 export async function createNotebook(title?: string): Promise<Notebook> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notebooks`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notebooks`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title }),
@@ -44,7 +46,7 @@ export async function createNotebook(title?: string): Promise<Notebook> {
 }
 
 export async function renameNotebook(notebookId: string, title: string): Promise<Notebook> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title }),
@@ -66,7 +68,7 @@ export async function customizeNotebook(
   notebookId: string,
   updates: NotebookCustomizeInput
 ): Promise<Notebook> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}/customize`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}/customize`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(updates),
@@ -79,7 +81,7 @@ export async function customizeNotebook(
 }
 
 export async function deleteNotebook(notebookId: string): Promise<boolean> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}`, {
     method: 'DELETE',
   });
   if (!response.ok) {
@@ -95,7 +97,7 @@ export interface NotebookSummary {
 }
 
 export async function fetchNotebookSummary(notebookId: string): Promise<NotebookSummary | null> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}/summary`, {
+  const response = await authFetch(`${API_BASE_URL}/api/v1/notebooks/${notebookId}/summary`, {
     cache: 'no-store',
   });
   if (!response.ok) {
