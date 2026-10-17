@@ -134,7 +134,8 @@ export const NotebookHome: React.FC = () => {
 
   return (
     <div
-      className="h-screen w-screen overflow-y-auto bg-notebook-bg text-notebook-text font-sans"
+      className="h-screen w-screen overflow-y-auto bg-notebook-bg text-notebook-text font-sans bg-cover bg-center bg-no-repeat bg-fixed"
+      style={{ backgroundImage: "url('/background.jpeg')" }}
       onClick={() => setOpenMenuId(null)}
     >
       {/* Header matching NotebookLM */}
